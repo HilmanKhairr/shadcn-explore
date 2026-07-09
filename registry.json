@@ -8,6 +8,10 @@
       "type": "registry:ui",
       "title": "Button",
       "description": "A simple button component.",
+      "dependencies": [
+        "@base-ui/react",
+        "lucide-react"
+      ],
       "files": [
         {
           "path": "src/components/ui/button.tsx",
