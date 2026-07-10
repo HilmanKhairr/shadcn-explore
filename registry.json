@@ -46,12 +46,13 @@
         "lucide-react"
       ],
       "registryDependencies": [
-        "select"
+        "HilmanKhairr/shadcn-explore/select"
       ],
       "files": [
         {
           "path": "src/components/block/CompactSelect.tsx",
-          "type": "registry:block"
+          "type": "registry:block",
+          "target": "@components/block/CompactSelect.tsx"
           }
       ]
     }
