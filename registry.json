@@ -10,6 +10,7 @@
       "description": "A simple button component.",
       "dependencies": [
         "@base-ui/react",
+        "class-variance-authority",
         "lucide-react"
       ],
       "files": [
@@ -17,6 +18,41 @@
           "path": "src/components/ui/button.tsx",
           "type": "registry:ui"
         }
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "A simple select component.",
+      "dependencies": [
+        "@base-ui/react",
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/select.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "compact-select",
+      "type": "registry:block",
+      "title": "Compact Select",
+      "description": "A compact Select component supporting flat and grouped items with built-in loading states.",
+      "dependencies": [
+        "@base-ui/react",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "select"
+      ],
+      "files": [
+        {
+          "path": "src/components/block/CompactSelect.tsx",
+          "type": "registry:block"
+          }
       ]
     }
   ]

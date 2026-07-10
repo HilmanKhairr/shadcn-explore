@@ -1,12 +1,12 @@
-import { Select } from "@/components/ui/select";
 import "./App.css";
+import CompactSelect from "./components/block/CompactSelect";
 import { Button } from "./components/ui/button";
 import { ThemeProvider } from "./providers/ThemeProvider";
 
 const buahOptions = [
-  { value: "apel", label: "Apel" },
-  { value: "pisang", label: "Pisang" },
-  { value: "jeruk", label: "Jeruk" },
+  { key: "apel", value: "Apel" },
+  { key: "pisang", value: "Pisang" },
+  { key: "jeruk", value: "Jeruk" },
 ];
 
 const menuOptions = [
@@ -28,27 +28,13 @@ const menuOptions = [
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="dark">
-      <Button className="bg-amber-500 text-black hover:bg-amber-600" loading fullWidth={false}>
+    <ThemeProvider defaultTheme="light">
+      <Button fullWidth className="bg-amber-500 text-black hover:bg-amber-600" loading>
         Halo
       </Button>
 
-      <Select
-        items={buahOptions}
-        label="Pilih Buah Kesukaan"
-        valueProps={{
-          placeholder: "Mau Buah Apa?",
-        }}
-        onValueChange={(val) => console.log("Terpilih:", val)}
-      />
-
-      <Select
-        items={menuOptions}
-        valueProps={{
-          placeholder: "Mau Pesan Apa?",
-        }}
-        onValueChange={(val) => console.log("Pesanan:", val)}
-      />
+      <CompactSelect fullWidth items={buahOptions} label="Pilih Buah Kesukaan" placeholder="Mau Buah Apa?" valueKey="key" labelKey="value" onValueChange={(val) => console.log("Terpilih:", val)} />
+      <CompactSelect fullWidth items={menuOptions} placeholder="Mau Pesan Apa?" onValueChange={(val) => console.log("Pesanan:", val)} />
     </ThemeProvider>
   );
 }

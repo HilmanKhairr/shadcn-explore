@@ -4,52 +4,35 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
-import type { Group } from "@base-ui/react/internals/resolveValueLabel";
-import { Loader2 } from "lucide-react";
-
-export interface SelectOption {
-  value: string;
-  label: string;
-}
-export type SelectGroupOption = Group<SelectOption> & { label?: string };
-
-type TriggerProps = SelectPrimitive.Trigger.Props & {
-  size?: "sm" | "default";
-  loading?: boolean;
-};
-type ValueProps = SelectPrimitive.Value.Props;
-type ScrollUpProps = SelectPrimitive.ScrollUpArrow.Props;
-type ScrollDownProps = SelectPrimitive.ScrollDownArrow.Props;
-type ContentProps = SelectPrimitive.Popup.Props & SelectPrimitive.Positioner.Props & ScrollUpProps & ScrollDownProps;
-
-interface SelectProps extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Root> {
-  items: SelectOption[] | SelectGroupOption[];
-  triggerProps?: TriggerProps;
-  valueProps?: ValueProps;
-  contentProps?: ContentProps;
-  label?: string;
-}
+const Select = SelectPrimitive.Root;
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return <SelectPrimitive.Group data-slot="select-group" className={cn("scroll-my-1 p-1", className)} {...props} />;
-}
-
-function SelectTrigger({ className, children, size = "default", loading = false, ...props }: TriggerProps) {
-  const Icon = loading ? Loader2 : ChevronDownIcon;
-
-  return (
-    <SelectPrimitive.Trigger data-slot="select-trigger" data-size={size} className={cn("border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 flex w-fit items-center justify-between gap-1.5 rounded-lg border bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-3 data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", className)} {...props}>
-      {children}
-      <SelectPrimitive.Icon render={<Icon className={cn("text-muted-foreground pointer-events-none size-4", loading ? "animate-spin" : "")} />} />
-    </SelectPrimitive.Trigger>
-  );
 }
 
 function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
   return <SelectPrimitive.Value data-slot="select-value" className={cn("flex flex-1 text-left", className)} {...props} />;
 }
 
-function SelectContent({ className, children, side = "bottom", sideOffset = 4, align = "center", alignOffset = 0, alignItemWithTrigger = true, ...props }: ContentProps) {
+function SelectTrigger({
+  className,
+  size = "default",
+  Icon = <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4" />,
+  children,
+  ...props
+}: SelectPrimitive.Trigger.Props & {
+  size?: "sm" | "default";
+  Icon?: React.ReactElement;
+}) {
+  return (
+    <SelectPrimitive.Trigger data-slot="select-trigger" data-size={size} className={cn("border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 flex w-fit items-center justify-between gap-1.5 rounded-lg border bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-3 data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", className)} {...props}>
+      {children}
+      <SelectPrimitive.Icon render={Icon} />
+    </SelectPrimitive.Trigger>
+  );
+}
+
+function SelectContent({ className, children, side = "bottom", sideOffset = 4, align = "center", alignOffset = 0, alignItemWithTrigger = true, ...props }: SelectPrimitive.Popup.Props & Pick<SelectPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger">) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner side={side} sideOffset={sideOffset} align={align} alignOffset={alignOffset} alignItemWithTrigger={alignItemWithTrigger} className="isolate z-50">
@@ -98,70 +81,4 @@ function SelectScrollDownButton({ className, ...props }: React.ComponentProps<ty
   );
 }
 
-function SelectContentGroup({ label, items }: { label?: string; items?: SelectOption[] | SelectGroupOption[] }) {
-  if (!items || items.length === 0) return null;
-
-  const isGroup = items.some((item) => item && "items" in item);
-
-  if (isGroup) {
-    const groupItems = items as SelectGroupOption[];
-
-    return (
-      <>
-        {groupItems.map((group, index) => {
-          if (!group || !group.items) return null;
-
-          return (
-            <React.Fragment key={`group-${group.label || index}`}>
-              <SelectGroup>
-                {!!group.label && <SelectLabel>{group.label}</SelectLabel>}
-
-                {group.items.map((item) => {
-                  if (!item) return null;
-                  return (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  );
-                })}
-              </SelectGroup>
-              {index < groupItems.length - 1 && <SelectSeparator />}
-            </React.Fragment>
-          );
-        })}
-      </>
-    );
-  }
-
-  const flatItems = items as SelectOption[];
-
-  return (
-    <SelectGroup>
-      {!!label && <SelectLabel>{label}</SelectLabel>}
-
-      {flatItems.map((item) => {
-        if (!item) return null;
-        return (
-          <SelectItem key={item.value} value={item.value}>
-            {item.label}
-          </SelectItem>
-        );
-      })}
-    </SelectGroup>
-  );
-}
-
-function Select({ items, triggerProps, valueProps, contentProps, label, ...props }: SelectProps) {
-  return (
-    <SelectPrimitive.Root {...props}>
-      <SelectTrigger className="w-full max-w-48" {...triggerProps}>
-        <SelectValue {...valueProps} />
-      </SelectTrigger>
-      <SelectContent {...contentProps}>
-        <SelectContentGroup label={label} items={items} />
-      </SelectContent>
-    </SelectPrimitive.Root>
-  );
-}
-
-export { Select, SelectPrimitive };
+export { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectScrollDownButton, SelectScrollUpButton, SelectSeparator, SelectTrigger, SelectValue };
