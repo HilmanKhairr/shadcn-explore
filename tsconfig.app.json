@@ -29,5 +29,5 @@
       ]
     }
   },
-  "include": ["src", "server.ts", "registry/block/CompactSelect.tsx", "registry/ui/select.tsx", "registry/ui/button.tsx"]
+  "include": ["src", "services", "services", "registry"]
 }

@@ -13,6 +13,7 @@ bun.lock
 node_modules
 dist
 dist-ssr
+dist-registry
 *.local
 
 # Editor directories and files
