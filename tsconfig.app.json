@@ -29,5 +29,5 @@
       ]
     }
   },
-  "include": ["src", "services", "services", "registry"]
+  "include": ["src", "registry", "api"]
 }
