@@ -15,7 +15,7 @@
       ],
       "files": [
         {
-          "path": "src/components/ui/button.tsx",
+          "path": "registry/ui/button.tsx",
           "type": "registry:ui"
         }
       ]
@@ -31,7 +31,7 @@
       ],
       "files": [
         {
-          "path": "src/components/ui/select.tsx",
+          "path": "registry/ui/select.tsx",
           "type": "registry:ui"
         }
       ]
@@ -50,7 +50,7 @@
       ],
       "files": [
         {
-          "path": "src/components/block/CompactSelect.tsx",
+          "path": "registry/block/CompactSelect.tsx",
           "type": "registry:block",
           "target": "@components/block/CompactSelect.tsx"
           }
