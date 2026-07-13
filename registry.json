@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "shadcn-explore",
-  "homepage": "https://github.com/HilmanKhairr/shadcn-explore.git",
+  "homepage": "https://shadcn-explore.vercel.app",
   "include": [
     "registry/ui/registry.json",
     "registry/block/registry.json"

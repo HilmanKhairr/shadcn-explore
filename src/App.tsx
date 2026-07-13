@@ -1,6 +1,6 @@
 import CompactSelect from "../registry/block/CompactSelect";
-import "./App.css";
 import { Button } from "../registry/ui/button";
+import "./App.css";
 import { ThemeProvider } from "./providers/ThemeProvider";
 
 const buahOptions = [
@@ -33,7 +33,7 @@ function App() {
         Halo
       </Button>
 
-      <CompactSelect fullWidth items={buahOptions} label="Pilih Buah Kesukaan" placeholder="Mau Buah Apa?" valueKey="key" labelKey="value" onValueChange={(val) => console.log("Terpilih:", val)} />
+      <CompactSelect fullWidth loading items={buahOptions} label="Pilih Buah Kesukaan" placeholder="Mau Buah Apa?" valueKey="key" labelKey="value" onValueChange={(val) => console.log("Terpilih:", val)} />
       <CompactSelect fullWidth items={menuOptions} placeholder="Mau Pesan Apa?" onValueChange={(val) => console.log("Pesanan:", val)} />
     </ThemeProvider>
   );

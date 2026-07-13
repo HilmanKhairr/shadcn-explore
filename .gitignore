@@ -7,7 +7,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-package.json
 package-lock.json
 bun.lock
 node_modules
@@ -28,3 +27,4 @@ dist-registry
 *.sw?
 
 .env
+.vercel
