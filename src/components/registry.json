@@ -1,0 +1,67 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "A custom button component extending Base UI.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority",
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "ui/button.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": [
+        "button"
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "A custom select component extending Base UI.",
+      "dependencies": [
+        "@base-ui/react",
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "ui/select.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": [
+        "select"
+      ]
+    },
+    {
+      "name": "compact-select",
+      "type": "registry:component",
+      "title": "Compact Select",
+      "description": "A compact select component supporting flat and grouped items with built-in loading states.",
+      "dependencies": [
+        "@base-ui/react",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "$BASE_URL/api/registry/select?token=$TOKEN_REGISTRY"
+      ],
+      "files": [
+        {
+          "path": "ui/compact/CompactSelect.tsx",
+          "type": "registry:component",
+          "target": "@components/ui/compact/CompactSelect.tsx"
+        }
+      ],
+      "categories": [
+        "select"
+      ]
+    }
+  ]
+}

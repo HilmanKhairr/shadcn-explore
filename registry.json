@@ -3,7 +3,6 @@
   "name": "shadcn-explore",
   "homepage": "https://shadcn-explore.vercel.app",
   "include": [
-    "registry/ui/registry.json",
-    "registry/block/registry.json"
+    "src/components/registry.json"
   ]
 }

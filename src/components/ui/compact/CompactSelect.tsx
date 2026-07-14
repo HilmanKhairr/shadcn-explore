@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import * as React from "react";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from "../ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from "../select";
 
 export type SelectGroupOption<T> = { label?: string; items: T[] };
 

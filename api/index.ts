@@ -8,6 +8,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET_TOKEN = process.env.TOKEN_REGISTRY || "";
 
+if (!process.env.VERCEL) {
+  app.use(express.static(join(process.cwd(), "dist")));
+}
+
 const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers["authorization"];
   const queryToken = req.query.token as string;
@@ -34,7 +38,7 @@ app.get("/api/registry/:component", requireAuth, async (req: Request, res: Respo
     res.status(200).send(fileContent);
   } catch (error) {
     console.error("Registry file error:", error);
-    res.status(404).json({ error: "Component registry tidak ditemukan" });
+    res.status(404).json({ error: "Component registry not found" });
   }
 });
 
@@ -43,12 +47,11 @@ app.get(/.*$/, (_: Request, res: Response): void => {
     res.sendFile(join(process.cwd(), "dist", "index.html"));
   } catch (error) {
     console.log(error);
-    res.status(500).send("Frontend assets tidak tersedia.");
+    res.status(500).send("Frontend assets not available.");
   }
 });
 
 if (!process.env.VERCEL) {
-  app.use(express.static(join(process.cwd(), "dist")));
   app.listen(PORT, () => {
     console.log(`🚀 [LOCAL MODE] Private Static Registry running at http://localhost:${PORT}`);
   });

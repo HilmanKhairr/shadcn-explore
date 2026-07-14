@@ -1,6 +1,6 @@
-import CompactSelect from "../registry/block/CompactSelect";
-import { Button } from "../registry/ui/button";
 import "./App.css";
+import { Button } from "./components/ui/button";
+import CompactSelect from "./components/ui/compact/CompactSelect";
 import { ThemeProvider } from "./providers/ThemeProvider";
 
 const buahOptions = [
