@@ -1,11 +1,23 @@
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, XIcon } from "lucide-react";
 import * as React from "react";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from "../select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from "../select";
 
 export type SelectGroupOption<T> = { label?: string; items: T[] };
 
-interface CompactSelectProps<T> extends Omit<React.ComponentPropsWithoutRef<typeof Select>, "items"> {
+type CompactSelectBaseProps<T> = Omit<
+  React.ComponentPropsWithoutRef<typeof Select>,
+  "items" | "value" | "onValueChange" | "multiple" | "defaultValue"
+> & {
   items: T[] | SelectGroupOption<T>[];
   label?: React.ReactNode;
   placeholder?: string;
@@ -13,7 +25,24 @@ interface CompactSelectProps<T> extends Omit<React.ComponentPropsWithoutRef<type
   fullWidth?: boolean;
   labelKey?: keyof T;
   valueKey?: keyof T;
-}
+  clearable?: boolean;
+};
+
+type CompactSelectProps<T> = CompactSelectBaseProps<T> &
+  (
+    | {
+        multiple?: false;
+        value?: string;
+        defaultValue?: string;
+        onValueChange?: (val: string | undefined) => void;
+      }
+    | {
+        multiple: true;
+        value?: string[];
+        defaultValue?: string[];
+        onValueChange?: (val: string[] | undefined) => void;
+      }
+  );
 
 interface SelectContentGroupProps<T> {
   label?: React.ReactNode;
@@ -22,7 +51,12 @@ interface SelectContentGroupProps<T> {
   valueKey: keyof T;
 }
 
-function SelectContentGroup<T extends Record<string, unknown>>({ label, items, labelKey, valueKey }: SelectContentGroupProps<T>) {
+function SelectContentGroup<T extends Record<string, unknown>>({
+  label,
+  items,
+  labelKey,
+  valueKey,
+}: SelectContentGroupProps<T>) {
   if (!items || items.length === 0) return null;
 
   const isGroup = items.some((item) => item && "items" in item);
@@ -83,15 +117,128 @@ function SelectContentGroup<T extends Record<string, unknown>>({ label, items, l
   );
 }
 
-function CompactSelect<T extends Record<string, unknown>>({ items, label, placeholder, loading = false, fullWidth = false, labelKey = "label", valueKey = "value", ...props }: CompactSelectProps<T>) {
+function CompactSelectTriggerIcon({
+  multiple,
+  loading,
+  value,
+  clearable,
+  handleRemoveValue,
+}: {
+  multiple: boolean;
+  loading: boolean;
+  value: string | string[] | undefined;
+  clearable?: boolean;
+  handleRemoveValue: () => void;
+}) {
+  const hasValue = React.useMemo(() => {
+    if (multiple) return Boolean((value as string[] | undefined)?.length);
+
+    return Boolean(value);
+  }, [multiple, value]);
+
+  if (loading) return <Loader2 className="h-4 w-4 animate-spin" />;
+  if (hasValue && !!clearable)
+    return (
+      <span
+        role="button"
+        tabIndex={0}
+        onPointerDown={(e) => {
+          e.stopPropagation();
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          handleRemoveValue();
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.stopPropagation();
+            e.preventDefault();
+            handleRemoveValue();
+          }
+        }}
+        className="bg-destructive/10 text-destructive hover:bg-destructive/20 pointer-events-auto z-20 inline-flex size-5 cursor-pointer items-center justify-center rounded-md transition-colors active:scale-95"
+        title="Clear Selection"
+      >
+        <XIcon className="size-3" />
+      </span>
+    );
+
+  return undefined;
+}
+
+function CompactSelect<T extends Record<string, unknown>>(
+  props: CompactSelectProps<T>
+) {
+  const {
+    items,
+    label,
+    placeholder,
+    loading = false,
+    fullWidth = false,
+    labelKey = "label",
+    valueKey = "value",
+    multiple,
+    value,
+    defaultValue,
+    clearable = true,
+    onValueChange,
+    ...restProps
+  } = props as CompactSelectBaseProps<T> & {
+    multiple?: boolean;
+    value?: string | string[];
+    defaultValue?: string | string[];
+    onValueChange?: (val: string | string[] | undefined) => void;
+  };
+
+  const isMultiple = multiple ?? false;
+
+  const handleRemoveValue = () => {
+    if (isMultiple) {
+      onValueChange?.([]);
+    } else {
+      onValueChange?.(undefined);
+    }
+  };
+
+  const handleSelectValueChange = (val: string | string[] | null) => {
+    onValueChange?.(val ?? undefined);
+  };
+
   return (
-    <Select disabled={loading} {...props}>
-      <SelectTrigger Icon={loading ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined} className={cn(fullWidth ? "w-full" : "")}>
+    <Select
+      multiple={isMultiple as boolean}
+      value={value as string & string[]}
+      defaultValue={defaultValue as string & string[]}
+      onValueChange={handleSelectValueChange}
+      disabled={loading}
+      {...restProps}
+    >
+      <SelectTrigger
+        Icon={
+          <CompactSelectTriggerIcon
+            multiple={isMultiple}
+            loading={loading}
+            value={value}
+            clearable={clearable}
+            handleRemoveValue={handleRemoveValue}
+          />
+        }
+        className={cn(fullWidth ? "w-full" : "")}
+      >
         <SelectValue placeholder={loading ? "Loading..." : placeholder} />
       </SelectTrigger>
 
       <SelectContent>
-        <SelectContentGroup label={label} items={items} labelKey={labelKey} valueKey={valueKey} />
+        <SelectContentGroup
+          label={label}
+          items={items}
+          labelKey={labelKey}
+          valueKey={valueKey}
+        />
       </SelectContent>
     </Select>
   );
