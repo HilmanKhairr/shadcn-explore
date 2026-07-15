@@ -2,6 +2,25 @@
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "items": [
     {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "A simple badge component extending Base UI.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority"
+      ],
+      "files": [
+        {
+          "path": "ui/badge.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": [
+        "badge"
+      ]
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
@@ -19,6 +38,45 @@
       ],
       "categories": [
         "button"
+      ]
+    },
+    {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "A custom calendar component extending Base UI.",
+      "dependencies": [
+        "react-day-picker",
+        "lucide-react"
+      ],"registryDependencies": [
+        "$BASE_URL/api/registry/button?token=$TOKEN_REGISTRY"
+      ],
+      "files": [
+        {
+          "path": "ui/calendar.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": [
+        "calendar"
+      ]
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "A custom popover component extending Base UI.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "files": [
+        {
+          "path": "ui/popover.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": [
+        "popover"
       ]
     },
     {
@@ -61,6 +119,34 @@
       ],
       "categories": [
         "select"
+      ]
+    },
+    {
+      "name": "compact-date-picker",
+      "type": "registry:component",
+      "title": "Compact Date Picker",
+      "description": "A compact date picker component supporting single, multiple, and range mode.",
+      "dependencies": [
+        "date-fns",
+        "react-day-picker",
+        "@base-ui/react",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "$BASE_URL/api/registry/badge?token=$TOKEN_REGISTRY",
+        "$BASE_URL/api/registry/button?token=$TOKEN_REGISTRY",
+        "$BASE_URL/api/registry/calendar?token=$TOKEN_REGISTRY",
+        "$BASE_URL/api/registry/popover?token=$TOKEN_REGISTRY"
+      ],
+      "files": [
+        {
+          "path": "ui/compact/CompactDatePicker.tsx",
+          "type": "registry:component",
+          "target": "@components/ui/compact/CompactDatePicker.tsx"
+        }
+      ],
+      "categories": [
+        "datepicker"
       ]
     }
   ]
