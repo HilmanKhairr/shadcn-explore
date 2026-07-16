@@ -1,7 +1,10 @@
 import CompactSelect from "@/components/ui/compact/CompactSelect";
 import { Apple, Bookmark, CheckSquare, Terminal, Utensils } from "lucide-react";
 import { useState } from "react";
-import { CustomToggle, PlaygroundCard } from "./PlaygroundCommon";
+import {
+  CustomToggle,
+  PlaygroundCard,
+} from "../../../components/PlaygroundCommon";
 
 // Mock Data
 const fruitOptions = [

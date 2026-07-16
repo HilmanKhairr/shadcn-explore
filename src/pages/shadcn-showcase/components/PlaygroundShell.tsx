@@ -1,21 +1,23 @@
-import { useState } from "react";
-import { ThemeToggle } from "./PlaygroundCommon";
-import ButtonPlayground from "./ButtonPlayground";
-import CompactSelectPlayground from "./CompactSelectPlayground";
-import CompactDatePickerPlayground from "./CompactDatePickerPlayground";
+import { cn } from "@/lib/utils";
 import {
-  MousePointerClick,
-  ListFilter,
-  CalendarRange,
-  Layers,
-  Terminal,
-  BookOpen,
-  Sparkles,
+  ArrowLeft,
   Blocks,
+  BookOpen,
+  CalendarRange,
   Cpu,
   Info,
+  Layers,
+  ListFilter,
+  MousePointerClick,
+  Sparkles,
+  Terminal,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Link } from "react-router";
+import { ThemeToggle } from "../../../components/PlaygroundCommon";
+import ButtonPlayground from "./ButtonPlayground";
+import CompactDatePickerPlayground from "./CompactDatePickerPlayground";
+import CompactSelectPlayground from "./CompactSelectPlayground";
 
 interface ComponentEntry {
   id: string;
@@ -86,6 +88,13 @@ export default function PlaygroundShell() {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-3 text-xs font-medium shadow-xs transition-all active:scale-95"
+            >
+              <ArrowLeft className="size-3.5" />
+              <span>Back to Hub</span>
+            </Link>
             <ThemeToggle />
           </div>
         </div>
