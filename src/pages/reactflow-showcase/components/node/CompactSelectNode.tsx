@@ -14,7 +14,6 @@ type CompactSelectNodeProps = Node<CompactSelectNodeData, "compactSelect">;
 
 const CompactSelectNode = memo(
   ({ data }: NodeProps<CompactSelectNodeProps>) => {
-    console.log("CompactSelectNode rendering! Data:", data);
     return (
       <div className="bg-card border-border hover:border-primary/60 min-w-50 rounded-xl border p-4 shadow-md">
         <div className="flex items-center gap-1.5">
@@ -35,6 +34,9 @@ const CompactSelectNode = memo(
         <Handle type="source" position={Position.Bottom} />
       </div>
     );
+  },
+  (prevProps, nextProps) => {
+    return prevProps.data === nextProps.data;
   }
 );
 

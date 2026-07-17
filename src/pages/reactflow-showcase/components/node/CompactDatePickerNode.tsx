@@ -17,7 +17,6 @@ type CompactDatePickerNodeProps = Node<
 
 const CompactDatePickerNode = memo(
   ({ data }: NodeProps<CompactDatePickerNodeProps>) => {
-    console.log("CompactDatePickerNode rendering! Data:", data);
     return (
       <div className="bg-card border-border hover:border-primary/60 min-w-50 rounded-xl border p-4 shadow-md">
         <div className="flex items-center gap-1.5">
@@ -38,6 +37,9 @@ const CompactDatePickerNode = memo(
         <Handle type="source" position={Position.Bottom} />
       </div>
     );
+  },
+  (prevProps, nextProps) => {
+    return prevProps.data === nextProps.data;
   }
 );
 

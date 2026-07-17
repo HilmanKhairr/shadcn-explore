@@ -19,8 +19,9 @@ import "@xyflow/react/dist/style.css";
 import { ArrowLeft } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
-import ButtonNode from "./components/node/Button";
-import CompactDatePickerNode from "./components/node/CompactDatePicker";
+import DashedBezierEdge from "./components/edge/DashedBezierEdge";
+import ButtonNode from "./components/node/ButtonNode";
+import CompactDatePickerNode from "./components/node/CompactDatePickerNode";
 
 const initialNodes: Node[] = [
   {
@@ -47,6 +48,8 @@ const initialEdges: Edge[] = [
     id: "n1-n2",
     source: "n1",
     target: "n2",
+    sourceHandle: "b",
+    type: "dashedBezier",
   },
   {
     id: "n2-n3",
@@ -59,6 +62,10 @@ const nodeTypes = {
   button: ButtonNode,
   compactSelect: CompactSelectNode,
   compactDatePicker: CompactDatePickerNode,
+};
+
+const edgeTypes = {
+  dashedBezier: DashedBezierEdge,
 };
 
 const ReactflowShowcase = () => {
@@ -110,6 +117,7 @@ const ReactflowShowcase = () => {
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           onConnect={onConnect}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
