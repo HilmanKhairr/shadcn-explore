@@ -1,5 +1,5 @@
 import { format as formatDate } from "date-fns";
-import { CalendarIcon, TrashIcon } from "lucide-react";
+import { CalendarIcon, TrashIcon, XIcon } from "lucide-react";
 import * as React from "react";
 import { type DateRange } from "react-day-picker";
 
@@ -28,6 +28,7 @@ type CompactDatePicker = {
 type CompactDatePickerProps = {
   format?: string;
   fullWidth?: boolean;
+  clearable?: boolean;
   placeholder?: string;
   slotProps?: CompactDatePicker;
 } & (
@@ -142,6 +143,7 @@ function CompactDatePicker(props: CompactDatePickerProps) {
     mode,
     format = "d/MM/y",
     fullWidth = false,
+    clearable = true,
     placeholder = `Select ${mode === "single" ? "a date" : "dates"}`,
     value,
     slotProps,
@@ -182,6 +184,43 @@ function CompactDatePicker(props: CompactDatePickerProps) {
     return Boolean(value?.from);
   }, [mode, value]);
 
+  const handleRemoveValue = () => {
+    if (mode === "multiple") {
+      onChange?.([]);
+      return;
+    }
+    onChange?.(undefined);
+  };
+
+  const renderClearButton = () => (
+    <span
+      role="button"
+      tabIndex={0}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        handleRemoveValue();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.stopPropagation();
+          e.preventDefault();
+          handleRemoveValue();
+        }
+      }}
+      className="bg-destructive/10 text-destructive hover:bg-destructive/20 pointer-events-auto z-20 hidden size-5 cursor-pointer items-center justify-center rounded-md transition-colors group-hover/picker:inline-flex active:scale-95"
+      title="Clear Value"
+    >
+      <XIcon className="size-3" />
+    </span>
+  );
+
   return (
     <Popover {...popoverProps}>
       <PopoverTrigger
@@ -192,7 +231,10 @@ function CompactDatePicker(props: CompactDatePickerProps) {
             size="sm"
             fullWidth={fullWidth}
             slotProps={{ span: { className: "block w-full" } }}
-            className={cn("relative block font-normal", buttonClassName)}
+            className={cn(
+              "group/picker relative block font-normal",
+              buttonClassName
+            )}
             {...restButtonProps}
           >
             <CalendarIcon
@@ -202,10 +244,27 @@ function CompactDatePicker(props: CompactDatePickerProps) {
             <span className="block w-full truncate px-8 text-center">
               {displayText}
             </span>
-            {hasValue && mode === "multiple" && (
-              <Badge className="absolute top-1/2 right-2 -translate-y-1/2">
-                {value?.length}
-              </Badge>
+            {hasValue && (
+              <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center justify-center">
+                {mode === "multiple" ? (
+                  clearable ? (
+                    <div className="relative inline-flex items-center justify-center">
+                      <span className="bg-destructive/60 absolute inset-0.5 animate-ping rounded-full opacity-50 group-hover/picker:hidden" />
+                      <Badge className="relative font-bold transition-all group-hover/picker:hidden">
+                        {value?.length}
+                      </Badge>
+
+                      {renderClearButton()}
+                    </div>
+                  ) : (
+                    <Badge className="relative font-bold">
+                      {value?.length}
+                    </Badge>
+                  )
+                ) : (
+                  !!clearable && renderClearButton()
+                )}
+              </div>
             )}
           </Button>
         }
@@ -237,3 +296,4 @@ function CompactDatePicker(props: CompactDatePickerProps) {
 }
 
 export default CompactDatePicker;
+

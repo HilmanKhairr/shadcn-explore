@@ -160,7 +160,7 @@ function CompactSelectTriggerIcon({
             handleRemoveValue();
           }
         }}
-        className="bg-destructive/10 text-destructive hover:bg-destructive/20 pointer-events-auto z-20 inline-flex size-5 cursor-pointer items-center justify-center rounded-md transition-colors active:scale-95"
+        className="bg-destructive/10 text-destructive hover:bg-destructive/20 pointer-events-auto invisible z-20 inline-flex size-5 cursor-pointer items-center justify-center rounded-md transition-colors group-hover/select:visible active:scale-95"
         title="Clear Selection"
       >
         <XIcon className="size-3" />
@@ -197,12 +197,18 @@ function CompactSelect<T extends Record<string, unknown>>(
   const isMultiple = multiple ?? false;
 
   const selectedLabel = React.useMemo(() => {
-    if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
+    if (
+      value === undefined ||
+      value === null ||
+      (Array.isArray(value) && value.length === 0)
+    ) {
       return undefined;
     }
 
     const flatItems: T[] = [];
-    const isGroup = items?.some((item) => item && typeof item === "object" && "items" in item);
+    const isGroup = items?.some(
+      (item) => item && typeof item === "object" && "items" in item
+    );
     if (isGroup) {
       (items as SelectGroupOption<T>[]).forEach((group) => {
         if (group && group.items) {
@@ -216,11 +222,15 @@ function CompactSelect<T extends Record<string, unknown>>(
     if (isMultiple) {
       const valueArray = Array.isArray(value) ? value : [value];
       const matchedLabels = flatItems
-        .filter((item) => valueArray.map(String).includes(String(item[valueKey])))
+        .filter((item) =>
+          valueArray.map(String).includes(String(item[valueKey]))
+        )
         .map((item) => String(item[labelKey]));
       return matchedLabels.length > 0 ? matchedLabels.join(", ") : undefined;
     } else {
-      const matched = flatItems.find((item) => String(item[valueKey]) === String(value));
+      const matched = flatItems.find(
+        (item) => String(item[valueKey]) === String(value)
+      );
       return matched ? String(matched[labelKey]) : undefined;
     }
   }, [value, items, labelKey, valueKey, isMultiple]);
@@ -256,7 +266,7 @@ function CompactSelect<T extends Record<string, unknown>>(
             handleRemoveValue={handleRemoveValue}
           />
         }
-        className={cn(fullWidth ? "w-full" : "")}
+        className={cn("group/select", fullWidth ? "w-full" : "")}
       >
         <SelectValue placeholder={loading ? "Loading..." : placeholder}>
           {selectedLabel}

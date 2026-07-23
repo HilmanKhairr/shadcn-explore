@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
+import type { HandleProps } from "@xyflow/react";
 import { Handle } from "@xyflow/react";
-import type { HandleProps } from "@xyflow/system";
 
 type DashedCircleHandleProps = {
   className?: string;

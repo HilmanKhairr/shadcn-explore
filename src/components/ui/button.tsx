@@ -6,7 +6,7 @@ import { Loader, Loader2 } from "lucide-react";
 import type React from "react";
 
 const buttonVariants = cva(
-  "group/button focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 active:not-aria-[haspopup]:scale-95 disabled:pointer-events-none disabled:opacity-50 aria-invalid:ring-3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 active:not-aria-[haspopup]:scale-95 disabled:pointer-events-none disabled:opacity-50 aria-invalid:ring-3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -36,7 +36,7 @@ const buttonVariants = cva(
       },
       fullWidth: {
         true: "w-full",
-        false: "w-fit",
+        false: "",
       },
     },
     defaultVariants: {
@@ -54,9 +54,28 @@ type ButtonSlotProps = {
 export interface ButtonProps
   extends ButtonPrimitive.Props, VariantProps<typeof buttonVariants> {
   loading?: boolean;
+  loadingPosition?: "left" | "center" | "right";
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
   slotProps?: ButtonSlotProps;
+}
+
+function ButtonLoader({
+  className,
+  isCenter,
+  ...props
+}: React.ComponentProps<typeof Loader2> & { isCenter?: boolean }) {
+  return (
+    <Loader2
+      className={cn(
+        "h-4 w-4 animate-spin",
+        className,
+        isCenter &&
+          "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      )}
+      {...props}
+    />
+  );
 }
 
 function Button({
@@ -64,6 +83,7 @@ function Button({
   variant = "default",
   size = "default",
   loading = false,
+  loadingPosition = "left",
   fullWidth = false,
   startIcon,
   endIcon,
@@ -76,6 +96,20 @@ function Button({
   const { className: loaderClassName, ...restLoaderProps } = loaderProps ?? {};
   const { className: spanClassName, ...restSpanProps } = spanProps ?? {};
 
+  const isIconSize =
+    size && ["icon-xs", "icon-sm", "icon", "icon-lg"].includes(size);
+
+  const showCenterLoader = loading && loadingPosition === "center";
+  const showLeftLoader = loading && loadingPosition === "left";
+  const showRightLoader = loading && loadingPosition === "right";
+
+  const showStartIcon =
+    startIcon && !showLeftLoader && !showCenterLoader && !isIconSize;
+  const showEndIcon =
+    endIcon && !showRightLoader && !showCenterLoader && !isIconSize;
+
+  const hasChildren = isIconSize ? !loading : !!children;
+
   return (
     <ButtonPrimitive
       data-slot="button"
@@ -83,23 +117,36 @@ function Button({
       className={cn(buttonVariants({ variant, size, fullWidth, className }))}
       {...props}
     >
-      {!!loading && (
-        <Loader2
-          className={cn("mr-2 h-4 w-4 animate-spin", loaderClassName)}
-          {...restLoaderProps}
-        />
+      {showLeftLoader && (
+        <ButtonLoader className={loaderClassName} {...restLoaderProps} />
       )}
-      {!loading && startIcon}
-      <span
-        className={cn(
-          "inline-flex flex-1 shrink-0 items-center justify-center",
-          spanClassName
-        )}
-        {...restSpanProps}
-      >
-        {children}
-      </span>
-      {endIcon}
+      {showStartIcon && startIcon}
+
+      {(hasChildren || showCenterLoader) && (
+        <span
+          className={cn(
+            "relative inline-flex flex-1 shrink-0 items-center justify-center",
+            spanClassName
+          )}
+          {...restSpanProps}
+        >
+          {showCenterLoader && (
+            <ButtonLoader
+              isCenter={hasChildren}
+              className={loaderClassName}
+              {...restLoaderProps}
+            />
+          )}
+          <span className={cn(showCenterLoader && "invisible")}>
+            {children}
+          </span>
+        </span>
+      )}
+
+      {showRightLoader && (
+        <ButtonLoader className={loaderClassName} {...restLoaderProps} />
+      )}
+      {showEndIcon && endIcon}
     </ButtonPrimitive>
   );
 }

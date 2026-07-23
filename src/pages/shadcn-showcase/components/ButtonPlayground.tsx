@@ -23,6 +23,7 @@ type ButtonSize =
   | "icon-xs"
   | "icon-sm"
   | "icon-lg";
+type LoadingPosition = "left" | "center" | "right";
 
 const buttonVariantOptions = [
   { value: "default", label: "Default" },
@@ -50,6 +51,8 @@ export default function ButtonPlayground() {
   const [btnVariant, setBtnVariant] = useState<ButtonVariant>("default");
   const [btnSize, setBtnSize] = useState<ButtonSize>("default");
   const [btnLoading, setBtnLoading] = useState(false);
+  const [btnLoadingPosition, setBtnLoadingPosition] =
+    useState<LoadingPosition>("left");
   const [btnDisabled, setBtnDisabled] = useState(false);
   const [btnFullWidth, setBtnFullWidth] = useState(false);
   const [btnHasIcon, setBtnHasIcon] = useState<"none" | "start" | "end">(
@@ -57,12 +60,17 @@ export default function ButtonPlayground() {
   );
   const [clickCount, setClickCount] = useState(0);
 
+  const loadingPositionAttr =
+    btnLoading && btnLoadingPosition !== "left"
+      ? `\n  loadingPosition="${btnLoadingPosition}"`
+      : "";
+
   const interactiveCode = `import { Button } from "@/components/ui/button";
 import { ${btnHasIcon === "start" ? "Plus" : btnHasIcon === "end" ? "ArrowRight" : ""} } from "lucide-react";
 
 <Button
   variant="${btnVariant}"
-  size="${btnSize}"${btnLoading ? "\n  loading" : ""}${btnDisabled ? "\n  disabled" : ""}${btnFullWidth ? "\n  fullWidth" : ""}
+  size="${btnSize}"${btnLoading ? "\n  loading" : ""}${loadingPositionAttr}${btnDisabled ? "\n  disabled" : ""}${btnFullWidth ? "\n  fullWidth" : ""}
   onClick={() => console.log("Clicked!")}
 >
   ${btnHasIcon === "start" ? '<Plus className="size-4" />\n  ' : ""}${btnText}${btnHasIcon === "end" ? '\n  <ArrowRight className="size-4" />' : ""}
@@ -110,14 +118,14 @@ import { ${btnHasIcon === "start" ? "Plus" : btnHasIcon === "end" ? "ArrowRight"
                 <Button variant={variant} size="lg">
                   lg size
                 </Button>
-                <Button variant={variant} size="icon" aria-label="Icon">
-                  <Plus className="size-4" />
-                </Button>
                 <Button variant={variant} size="icon-xs" aria-label="Icon xs">
                   <Settings className="size-3" />
                 </Button>
                 <Button variant={variant} size="icon-sm" aria-label="Icon sm">
                   <Search className="size-3.5" />
+                </Button>
+                <Button variant={variant} size="icon" aria-label="Icon">
+                  <Plus className="size-4" />
                 </Button>
                 <Button variant={variant} size="icon-lg" aria-label="Icon lg">
                   <Send className="size-5" />
@@ -139,25 +147,19 @@ import { ${btnHasIcon === "start" ? "Plus" : btnHasIcon === "end" ? "ArrowRight"
           </p>
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-3">
-              <Button loading>Loading Default</Button>
-              <Button variant="outline" loading>
-                Loading Outline
+              <Button loading>Left</Button>
+              <Button variant="outline" loading loadingPosition="center">
+                Center
               </Button>
-              <Button variant="destructive" loading size="sm">
-                Destructive sm
+              <Button loading variant="destructive" loadingPosition="right">
+                Right
               </Button>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <Button disabled>Disabled Button</Button>
-              <Button variant="ghost" disabled>
-                Disabled Ghost
-              </Button>
             </div>
             <div className="flex flex-col gap-2">
               <Button fullWidth>Full Width Primary</Button>
-              <Button variant="outline" fullWidth>
-                Full Width Outline
-              </Button>
             </div>
           </div>
         </div>
@@ -170,20 +172,31 @@ import { ${btnHasIcon === "start" ? "Plus" : btnHasIcon === "end" ? "ArrowRight"
             Buttons with icons, custom badges, or complex children.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Button>
-              <Search className="mr-1.5 size-4" /> Search Docs
+            <Button startIcon={<Search className="mr-1.5 size-4" />}>
+              Search Docs
             </Button>
-            <Button variant="secondary">
-              Add Item <Plus className="ml-1.5 size-4" />
+            <Button
+              variant="secondary"
+              endIcon={<Plus className="ml-1.5 size-4" />}
+            >
+              Add Item
             </Button>
-            <Button variant="outline">
-              <Settings className="mr-1.5 size-4" /> Configure
-              <span className="bg-primary/10 text-primary ml-2 rounded px-1.5 py-0.5 text-[10px] font-bold">
-                PRO
-              </span>
+            <Button
+              variant="outline"
+              startIcon={<Settings className="mr-1.5 size-4" />}
+              endIcon={
+                <span className="bg-primary/10 text-primary ml-2 rounded px-1.5 py-0.5 text-[10px] font-bold">
+                  PRO
+                </span>
+              }
+            >
+              Configure
             </Button>
-            <Button variant="destructive">
-              <Trash2 className="mr-1.5 size-4" /> Delete Account
+            <Button
+              variant="destructive"
+              startIcon={<Trash2 className="mr-1.5 size-4" />}
+            >
+              Delete Account
             </Button>
           </div>
         </div>
@@ -193,7 +206,7 @@ import { ${btnHasIcon === "start" ? "Plus" : btnHasIcon === "end" ? "ArrowRight"
       <PlaygroundCard
         title="Interactive Builder"
         badge="ui/button"
-        description="Configure variants, sizes, state toggles, and label text to instantly test the output and obtain copy-paste code."
+        description="Configure variants, sizes, state toggles, loading positions, and label text to instantly test the output and obtain copy-paste code."
         code={interactiveCode}
         controls={
           <>
@@ -252,6 +265,23 @@ import { ${btnHasIcon === "start" ? "Plus" : btnHasIcon === "end" ? "ArrowRight"
               </div>
             </div>
 
+            <div className="flex flex-col gap-1.5">
+              <label className="text-muted-foreground text-xs font-semibold">
+                Loading Position
+              </label>
+              <div className="border-border bg-background flex rounded-lg border p-0.5">
+                {(["left", "center", "right"] as const).map((pos) => (
+                  <button
+                    key={pos}
+                    onClick={() => setBtnLoadingPosition(pos)}
+                    className={`flex-1 cursor-pointer rounded-md py-1.5 text-xs font-medium transition-all ${btnLoadingPosition === pos ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    {pos}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="mt-2 flex flex-col gap-2">
               <CustomToggle
                 checked={btnLoading}
@@ -277,13 +307,18 @@ import { ${btnHasIcon === "start" ? "Plus" : btnHasIcon === "end" ? "ArrowRight"
             variant={btnVariant}
             size={btnSize}
             loading={btnLoading}
+            loadingPosition={btnLoadingPosition}
             disabled={btnDisabled}
             fullWidth={btnFullWidth}
+            startIcon={
+              btnHasIcon === "start" && <Plus className="mr-1.5 size-4" />
+            }
+            endIcon={
+              btnHasIcon === "end" && <ArrowRight className="ml-1.5 size-4" />
+            }
             onClick={() => setClickCount((c) => c + 1)}
           >
-            {btnHasIcon === "start" && <Plus className="mr-1.5 size-4" />}
             {btnText}
-            {btnHasIcon === "end" && <ArrowRight className="ml-1.5 size-4" />}
           </Button>
 
           <p className="text-muted-foreground bg-muted/60 border-border mt-2 rounded-full border px-3 py-1.5 text-xs">
@@ -297,4 +332,3 @@ import { ${btnHasIcon === "start" ? "Plus" : btnHasIcon === "end" ? "ArrowRight"
     </div>
   );
 }
-
