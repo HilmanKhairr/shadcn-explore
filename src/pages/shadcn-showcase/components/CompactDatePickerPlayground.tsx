@@ -1,5 +1,5 @@
-import CompactDatePicker from "@/components/ui/compact/CompactDatePicker";
-import CompactSelect from "@/components/ui/compact/CompactSelect";
+import CompactDatePicker from "@/components/compact/CompactDatePicker";
+import CompactSelect from "@/components/compact/CompactSelect";
 import { format as formatDate } from "date-fns";
 import { CalendarDays, CalendarRange, Clock, Terminal } from "lucide-react";
 import { useState } from "react";

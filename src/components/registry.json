@@ -112,9 +112,9 @@
       ],
       "files": [
         {
-          "path": "ui/compact/CompactSelect.tsx",
+          "path": "compact/CompactSelect.tsx",
           "type": "registry:component",
-          "target": "@components/ui/compact/CompactSelect.tsx"
+          "target": "@components/compact/CompactSelect.tsx"
         }
       ],
       "categories": [
@@ -140,9 +140,9 @@
       ],
       "files": [
         {
-          "path": "ui/compact/CompactDatePicker.tsx",
+          "path": "compact/CompactDatePicker.tsx",
           "type": "registry:component",
-          "target": "@components/ui/compact/CompactDatePicker.tsx"
+          "target": "@components/compact/CompactDatePicker.tsx"
         }
       ],
       "categories": [

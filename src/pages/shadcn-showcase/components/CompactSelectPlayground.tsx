@@ -1,4 +1,4 @@
-import CompactSelect from "@/components/ui/compact/CompactSelect";
+import CompactSelect from "@/components/compact/CompactSelect";
 import { Apple, Bookmark, CheckSquare, Terminal, Utensils } from "lucide-react";
 import { useState } from "react";
 import {

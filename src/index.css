@@ -2,9 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-@layer base {
-  @import "@xyflow/react/dist/style.css";
-}
+@import "@xyflow/react/dist/style.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -192,6 +190,13 @@ p {
   --sidebar-ring: oklch(0.70 0.18 280);
 }
 
+.react-flow {
+  --xy-edge-stroke-selected-default: var(--primary); 
+  --xy-controls-button-color-default: var(--primary);
+  --xy-controls-button-color-hover-default: color-mix(in srgb, var(--primary) 60%, transparent);
+  --xy-controls-button-border-color-default: var(--background);
+  --xy-minimap-background-color-default: var(--background);
+}
 
 @layer base {
   * {

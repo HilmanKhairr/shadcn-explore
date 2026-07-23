@@ -1,21 +1,55 @@
 import { cn } from "@/lib/utils";
-import { Handle } from "@xyflow/react";
-import type { HandleProps } from "@xyflow/system";
+import type { Connection, Edge, HandleProps } from "@xyflow/react";
+import { Handle, useNodeConnections } from "@xyflow/react";
 
 type DashedCircleHandleProps = {
+  id: string;
+  accepts?: string[];
   className?: string;
-  strokeClassName?: string;
   fillClassName?: string;
+  strokeClassName?: string;
 } & HandleProps;
 
 const DashedCircleHandle = (props: DashedCircleHandleProps) => {
-  const { className, strokeClassName, fillClassName, ...restProps } =
-    props ?? {};
+  const {
+    id,
+    accepts,
+    className,
+    fillClassName,
+    strokeClassName,
+    isConnectable = true,
+    ...restProps
+  } = props ?? {};
+  const connections = useNodeConnections({
+    handleId: id,
+    handleType: restProps.type,
+  });
+
+  const checkValidConnection = (connection: Connection | Edge) => {
+    if (!accepts || accepts.length === 0) return true;
+
+    let oppositeHandleId = connection.targetHandle ?? connection.sourceHandle;
+
+    if (restProps.type === "source") oppositeHandleId = connection.targetHandle;
+    if (restProps.type === "target") oppositeHandleId = connection.sourceHandle;
+
+    return (
+      typeof oppositeHandleId === "string" && accepts.includes(oppositeHandleId)
+    );
+  };
+
+  const disabled = !isConnectable && connections.length < 1;
 
   return (
-    <Handle className={cn("border-none bg-none", className)} {...restProps}>
+    <Handle
+      id={id}
+      className={cn("group h-3! w-3! border-none bg-none", className)}
+      isValidConnection={checkValidConnection}
+      isConnectable={isConnectable}
+      {...restProps}
+    >
       <svg
-        className="group absolute top-1/2 left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 overflow-visible"
+        className="group pointer-events-none absolute top-1/2 left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 overflow-visible"
         viewBox="0 0 12 12"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -23,22 +57,24 @@ const DashedCircleHandle = (props: DashedCircleHandleProps) => {
         <circle
           cx="6"
           cy="6"
-          r="5.5"
+          r="11"
           stroke="currentColor"
-          strokeWidth="1"
-          strokeDasharray="3 1"
+          strokeWidth="3"
+          strokeDasharray="5 2"
           className={cn(
             "transition-colors",
-            strokeClassName ?? "text-border group-hover:text-primary/50"
+            strokeClassName ?? "text-border group-hover:text-primary/50",
+            disabled && "group-hover:text-muted/50"
           )}
         />
         <circle
           cx="6"
           cy="6"
-          r="3.5"
+          r="7"
           className={cn(
             "transition-colors",
-            fillClassName ?? "fill-amber-600 group-hover:fill-amber-500"
+            fillClassName ?? "fill-amber-600 group-hover:fill-amber-500",
+            disabled && "fill-muted group-hover:fill-muted-500"
           )}
         />
       </svg>
