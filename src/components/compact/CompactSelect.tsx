@@ -266,7 +266,7 @@ function CompactSelect<T extends Record<string, unknown>>(
             handleRemoveValue={handleRemoveValue}
           />
         }
-        className={cn("group/select", fullWidth ? "w-full" : "")}
+        className={cn("group/select bg-background!", fullWidth ? "w-full" : "")}
       >
         <SelectValue placeholder={loading ? "Loading..." : placeholder}>
           {selectedLabel}

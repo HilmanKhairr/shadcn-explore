@@ -9,7 +9,7 @@ import type {
   ReactFlowProps,
 } from "@xyflow/react";
 
-export type OutputFormat = "json" | "pdf" | "csv";
+export type OutputFormat = "json" | "csv";
 
 export type InputFileNodeData = {
   title?: string;
@@ -27,32 +27,35 @@ export type InputFileNodeData = {
   } | null;
 };
 
-export type FilterFileNodeData = {
+export type ModifFileNodeData = {
   title?: string;
   description?: string;
+  headers?: string[];
+
   filterColumn?: string;
   filterOperation?: string;
   filterValue?: string;
   limitRows?: number;
   removeEmptyRows?: boolean;
   trimWhitespace?: boolean;
-  headers?: string[];
+  sortColumn?: string;
+  sortDirection?: "asc" | "desc";
 };
 
 export type OutputFileNodeData = {
   title?: string;
   description?: string;
   outputFormat?: OutputFormat;
+  mergeOutput?: boolean;
   filename?: string;
   status?: "idle" | "running" | "completed" | "error";
-  generatedContent?: string;
   payload?: PipelinePayload;
 };
 
 // prettier-ignore
 export type CustomNodeData = 
   InputFileNodeData &
-  FilterFileNodeData &
+  ModifFileNodeData &
   OutputFileNodeData;
 
 export type PipelineFile = {
@@ -65,8 +68,8 @@ export type PipelineConfig = {
 };
 
 export type PipelineDataItem = {
-  file?: PipelineFile;
-  config?: PipelineConfig;
+  fileData?: PipelineFile;
+  configData?: PipelineConfig;
 };
 
 export type PipelinePayload = {
@@ -89,6 +92,10 @@ export type PipelineState = {
   setNodes: (nodes: Node<CustomNodeData>[]) => void;
   setEdges: (edges: Edge[]) => void;
   updateNodeData: (nodeId: string, data: Partial<CustomNodeData>) => void;
+  addNode: (
+    type: "inputNode" | "modifNode" | "outputNode",
+    variant?: string
+  ) => void;
 
   getNodePayload: (targetNodeId: string) => PipelinePayload;
 };

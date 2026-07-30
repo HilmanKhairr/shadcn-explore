@@ -1,213 +1,142 @@
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import {
-  Background,
-  BackgroundVariant,
-  Controls,
-  MiniMap,
-  ReactFlow,
-} from "@xyflow/react";
-import { ArrowLeft, ChevronDown } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router";
-import DashedBezierEdge from "./components/edge/DashedBezierEdge";
-import FilterFileNode from "./components/node/FilterFileNode";
-import InputFileNode from "./components/node/InputFileNode";
-import OutputFileNode from "./components/node/OutputFileNode";
-import usePipelineStore from "./hooks/usePipelineStore";
+import { ArrowLeft, ArrowRight, Network, RefreshCw, Zap } from "lucide-react";
+import { Link } from "react-router";
+import { ThemeToggle } from "@/components/PlaygroundCommon";
 
-const nodeTypes = {
-  inputNode: InputFileNode,
-  filterNode: FilterFileNode,
-  outputFile: OutputFileNode,
-};
-
-const edgeTypes = {
-  dashedBezier: DashedBezierEdge,
-};
-
-const ReactflowShowcase = () => {
-  const navigate = useNavigate();
-  const {
-    nodes,
-    edges,
-    // updateNodeData,
-    onNodesChange,
-    onEdgesChange,
-    onConnect,
-    onReconnect,
-    onReconnectStart,
-    onReconnectEnd,
-  } = usePipelineStore();
-
-  const [openBuilderPanel, setOpenBuilderPanel] = useState(false);
-  // const [openConfigPanel, setOpenConfigPanel] = useState(false);
-
-  const selectedNode = useMemo(() => {
-    return nodes.find((n) => n.selected);
-  }, [nodes]);
-
+export default function ReactflowShowcaseIndex() {
   return (
-    <div className="bg-background text-foreground flex h-screen flex-col antialiased">
-      <header className="border-border bg-card/80 sticky top-0 z-50 flex items-center justify-between border-b px-6 py-4">
-        <div className="flex items-center gap-2.5">
-          <Button
-            variant="outline"
-            startIcon={<ArrowLeft className="size-3.5" />}
-            onClick={() => navigate("/")}
-          >
-            Back to Hub
-          </Button>
-          <span className="ml-2 text-sm font-bold">
-            Data Processing Pipeline
+    <div className="bg-background text-foreground relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-4 antialiased">
+      {/* Top Banner Grid background */}
+      <div className="pointer-events-none absolute inset-0 z-0 h-[600px] bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-[size:24px_24px]" />
+
+      {/* Header */}
+      <header className="border-border/40 relative z-10 flex w-full max-w-6xl items-center justify-between border-b py-6">
+        <Link
+          to="/"
+          className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors"
+        >
+          <ArrowLeft className="size-4" />
+          Back to Hub
+        </Link>
+        <div className="flex items-center gap-2">
+          <span className="text-foreground text-sm font-bold tracking-tight">
+            React Flow Showcase
           </span>
         </div>
+        <ThemeToggle />
       </header>
 
-      <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
-        <div className="border-border bg-card/40 flex max-h-40 w-full shrink-0 flex-col overflow-y-auto border-b text-left md:max-h-full md:w-52 md:border-r md:border-b-0">
-          <Button
-            fullWidth
-            variant="ghost"
-            endIcon={
-              <ChevronDown
-                className={`size-4 shrink-0 transition-transform duration-300 md:hidden ${openBuilderPanel ? "rotate-180" : ""}`}
-              />
-            }
-            className="h-auto! rounded-none! px-6 py-4 active:scale-100! md:pointer-events-none md:cursor-default"
-            onClick={() => setOpenBuilderPanel((prev) => !prev)}
+      {/* Hero Section */}
+      <main className="relative z-10 my-auto flex w-full max-w-5xl flex-col items-center py-12 text-center">
+        <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-3.5 py-1 text-xs font-semibold text-fuchsia-600 dark:bg-fuchsia-400/10 dark:text-fuchsia-400">
+          <Network className="size-3.5" />
+          Architecture Paradigm Comparison
+        </div>
+
+        <h1 className="text-foreground mt-2 block max-w-3xl text-4xl leading-[1.15] font-extrabold tracking-tight md:text-5xl">
+          Choose a{" "}
+          <span className="bg-gradient-to-r from-fuchsia-500 to-indigo-500 bg-clip-text text-transparent">
+            Flow Architecture
+          </span>
+        </h1>
+
+        <p className="text-muted-foreground mt-4 max-w-xl text-base md:text-lg">
+          Explore two distinct state propagation models in node-based canvas graphs: Pull-based Graph Traversal vs Push-based Reactive Dataflow.
+        </p>
+
+        {/* Showcase Cards Grid */}
+        <div className="mt-12 grid w-full grid-cols-1 gap-8 text-left sm:grid-cols-2">
+          {/* Graph Traversal Card */}
+          <Link
+            to="/reactflow-showcase/graph-traversal"
+            className="group border-border bg-card relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-fuchsia-500/50 hover:shadow-[0_15px_30px_-10px_rgba(217,70,239,0.15)]"
           >
-            <h2>Workflow Builder</h2>
-          </Button>
-          <div
-            className={`grid transition-[grid-template-rows] duration-300 ease-in-out md:grid-rows-[1fr]! ${openBuilderPanel ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
-          >
-            <div className="overflow-hidden">
-              <p className="text-muted-foreground px-6 pb-6 text-sm">
-                Pipeline data processing dari Upload CSV - Transform Config -
-                Output Konversi (.json / .pdf) via Trigger.dev.
+            {/* Background Glow */}
+            <div className="absolute -top-16 -right-16 -z-10 size-48 rounded-full bg-fuchsia-500/10 blur-3xl transition-all duration-500 group-hover:scale-125" />
+
+            <div>
+              <div className="flex size-12 items-center justify-center rounded-2xl bg-fuchsia-500/10 text-fuchsia-600 transition-all duration-300 group-hover:scale-110 dark:text-fuchsia-400">
+                <RefreshCw className="size-6" />
+              </div>
+              <h2 className="text-foreground mt-6 text-2xl font-bold tracking-tight transition-colors group-hover:text-fuchsia-500">
+                Graph Traversal (Pull Model)
+              </h2>
+              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                Nodes pull data dynamically from upstream connections on-demand. Uses graph traversal functions and memoized store selectors.
               </p>
+
+              {/* Tag Badges */}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {[
+                  "On-Demand Pull",
+                  "Graph Traversal",
+                  "Zustand Selector",
+                  "useShallow / Cache",
+                ].map((tag) => (
+                  <span
+                    key={tag}
+                    className="border-border bg-muted/50 text-muted-foreground rounded-full border px-2.5 py-0.5 text-xs"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div
-          className={cn(
-            "relative flex flex-1",
-            selectedNode
-              ? "w-full md:w-[calc(100vw-31rem)]"
-              : "w-full md:w-[calc(100vw-13rem)]"
-          )}
-        >
-          <ReactFlow
-            fitView
-            defaultEdgeOptions={{ type: "dashedBezier" }}
-            nodes={nodes}
-            edges={edges}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            onConnect={onConnect}
-            onReconnect={onReconnect}
-            onReconnectStart={onReconnectStart}
-            onReconnectEnd={onReconnectEnd}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-          >
-            <Controls
-              fitViewOptions={{
-                duration: 2000,
-              }}
-            />
-            <MiniMap
-              pannable
-              zoomable
-              nodeBorderRadius={20}
-              nodeStrokeWidth={3}
-              nodeStrokeColor="var(--foreground)"
-            />
-            <Background
-              id="1"
-              gap={50}
-              size={8}
-              variant={BackgroundVariant.Cross}
-            />
-            <Background
-              id="2"
-              gap={25}
-              size={3}
-              offset={15}
-              color="#ccc"
-              variant={BackgroundVariant.Dots}
-            />
-          </ReactFlow>
-        </div>
-
-        {/* <div
-          className={cn(
-            "border-border bg-card/40 flex shrink-0 flex-col overflow-y-auto border-t text-left transition-all duration-300 md:border-t-0 md:border-l",
-            selectedNode ? "w-full md:w-72" : "h-0 w-0"
-          )}
-        >
-          <Button
-            fullWidth
-            variant="ghost"
-            endIcon={
-              <ChevronDown
-                className={`size-4 shrink-0 transition-transform duration-300 md:hidden ${openConfigPanel ? "rotate-180" : ""}`}
-              />
-            }
-            className="h-auto! rounded-none! px-6 py-4 active:scale-100! md:pointer-events-none md:cursor-default"
-            onClick={() => setOpenConfigPanel((prev) => !prev)}
-          >
-            <h2>Node Configuration</h2>
-          </Button>
-          <div
-            className={`grid transition-[grid-template-rows] duration-300 ease-in-out md:grid-rows-[1fr]! ${openConfigPanel ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
-          >
-            <div className="overflow-hidden">
-              {selectedNode ? (
-                <div className="animate-in fade-in flex flex-col gap-4 px-6 pb-6 duration-200">
-                  <div className="bg-muted rounded-md p-3">
-                    <p className="text-muted-foreground font-mono text-xs">
-                      ID: {selectedNode.id}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold capitalize">
-                      Type: {selectedNode.type}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs font-medium">Node Label</label>
-                    <input
-                      type="text"
-                      className="border-input placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-1 focus-visible:outline-none"
-                      value={String(selectedNode.data.title || "")}
-                      onChange={(e) => {
-                        const nextLabel = e.target.value;
-                        updateNodeData(selectedNode.id, { title: nextLabel });
-                      }}
-                    />
-                  </div>
-                  <p className="text-muted-foreground text-xs italic">
-                    Modifying this input updates the global node state
-                    instantly.
-                  </p>
-                </div>
-              ) : (
-                <div className="border-muted flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-8 text-center">
-                  <p className="text-muted-foreground px-4 text-sm">
-                    No node selected. Click a node on the canvas to configure
-                    its properties.
-                  </p>
-                </div>
-              )}
+            <div className="mt-8 flex items-center text-sm font-semibold text-fuchsia-500 group-hover:text-fuchsia-600">
+              Open Graph Traversal
+              <ArrowRight className="ml-1.5 size-4 transition-transform duration-300 group-hover:translate-x-1" />
             </div>
-          </div>
-        </div> */}
-      </div>
+          </Link>
+
+          {/* Push Dataflow Card */}
+          <Link
+            to="/reactflow-showcase/push-dataflow"
+            className="group border-border bg-card relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/50 hover:shadow-[0_15px_30px_-10px_rgba(99,102,241,0.15)]"
+          >
+            {/* Background Glow */}
+            <div className="absolute -top-16 -right-16 -z-10 size-48 rounded-full bg-indigo-500/10 blur-3xl transition-all duration-500 group-hover:scale-125" />
+
+            <div>
+              <div className="flex size-12 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 transition-all duration-300 group-hover:scale-110 dark:text-indigo-400">
+                <Zap className="size-6" />
+              </div>
+              <h2 className="text-foreground mt-6 text-2xl font-bold tracking-tight transition-colors group-hover:text-indigo-500">
+                Push Dataflow (Reactive Model)
+              </h2>
+              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                Nodes automatically push state updates downstream whenever their values change. Real-time event propagation across node edges.
+              </p>
+
+              {/* Tag Badges */}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {[
+                  "Reactive Push",
+                  "Event Driven",
+                  "Real-Time Stream",
+                  "Direct Handle Connections",
+                ].map((tag) => (
+                  <span
+                    key={tag}
+                    className="border-border bg-muted/50 text-muted-foreground rounded-full border px-2.5 py-0.5 text-xs"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 flex items-center text-sm font-semibold text-indigo-500 group-hover:text-indigo-600">
+              Open Push Dataflow
+              <ArrowRight className="ml-1.5 size-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </div>
+          </Link>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-border/40 text-muted-foreground relative z-10 w-full max-w-6xl border-t py-8 text-center text-xs">
+        <p>© 2026 React Flow Architecture Showcase</p>
+      </footer>
     </div>
   );
-};
-
-export default ReactflowShowcase;
-
+}

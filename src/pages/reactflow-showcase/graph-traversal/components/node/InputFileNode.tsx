@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { getFileName, getFileSize, getTypesFromExtensions } from "@/lib/files";
 import { cn, formatBytes } from "@/lib/utils";
-import usePipelineStore from "@/pages/reactflow-showcase/hooks/usePipelineStore";
-import type { InputFileNodeData } from "@/pages/reactflow-showcase/types/pipeline";
+import usePipelineStore from "@/pages/reactflow-showcase/graph-traversal/hooks/usePipelineStore";
+import type { InputFileNodeData } from "@/pages/reactflow-showcase/graph-traversal/types/pipeline";
 import type { Node, NodeProps } from "@xyflow/react";
 import { Position } from "@xyflow/react";
 import {
@@ -16,8 +16,8 @@ import {
   XIcon,
 } from "lucide-react";
 import { memo, useRef } from "react";
+import { EDGE_TYPES } from "../../constants/pipeline";
 import DashedCircleHandle from "../handle/DashedCircleHadle";
-import { EDGE_CLASSIFICATION } from "../../constants/pipeline";
 
 export type InputFileNodeProps = Node<InputFileNodeData, "inputNode">;
 
@@ -50,7 +50,6 @@ const InputFileNode = memo(
       });
 
       const added = addedFiles?.[0];
-      console.log("added", added);
       if (added) {
         updateNodeData(id, {
           fileInfo: {
@@ -168,8 +167,8 @@ const InputFileNode = memo(
         <DashedCircleHandle
           type="source"
           position={Position.Right}
-          id={EDGE_CLASSIFICATION.INPUT}
-          accepts={[EDGE_CLASSIFICATION.INPUT]}
+          id={EDGE_TYPES.INPUT}
+          accepts={[EDGE_TYPES.INPUT]}
           fillClassName="fill-emerald-600 group-hover:fill-emerald-500"
         />
       </div>

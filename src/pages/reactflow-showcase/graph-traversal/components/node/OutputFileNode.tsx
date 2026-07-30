@@ -1,29 +1,44 @@
 import CompactSelect from "@/components/compact/CompactSelect";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { downloadFile } from "@/lib/files";
 import { cn } from "@/lib/utils";
-import usePipelineStore from "@/pages/reactflow-showcase/hooks/usePipelineStore";
+import usePipelineStore from "@/pages/reactflow-showcase/graph-traversal/hooks/usePipelineStore";
 import type {
   OutputFileNodeData,
   OutputFormat,
-} from "@/pages/reactflow-showcase/types/pipeline";
+  PipelineConfig,
+} from "@/pages/reactflow-showcase/graph-traversal/types/pipeline";
 import type { Node, NodeProps } from "@xyflow/react";
 import { Position } from "@xyflow/react";
 import { CheckCircle2, FileCheck, Loader2, Zap } from "lucide-react";
-import { memo, useState } from "react";
-import { EDGE_CLASSIFICATION } from "../../constants/pipeline";
+import { EDGE_TYPES } from "../../constants/pipeline";
 import DashedCircleHandle from "../handle/DashedCircleHadle";
 
-export type OutputFileNodeProps = Node<OutputFileNodeData, "outputFile">;
+import { ALLOWED_FILE_TYPES } from "@/constants/files";
+import {
+  convertRowsToCsv,
+  processInputData,
+  type TransformOptions,
+} from "@/triggers/csvConverter";
+import { memo, useState } from "react";
+
+export type OutputFileNodeProps = Node<OutputFileNodeData, "outputNode">;
+
+type Results = {
+  fileName: string;
+  rows: Record<string, unknown>[];
+};
 
 const outputFormatOptions = [
   { value: "json", label: "JSON Data Payload (.json)" },
-  { value: "pdf", label: "PDF Document (.pdf)" },
   { value: "csv", label: "Processed CSV (.csv)" },
 ];
 
 const OutputFileNode = memo(
   ({ id, data, selected }: NodeProps<OutputFileNodeProps>) => {
+    const mergeOutput = data?.mergeOutput ?? false;
+
     const [isRunningTrigger, setIsRunningTrigger] = useState(false);
 
     const updateNodeData = usePipelineStore((s) => s.updateNodeData);
@@ -42,22 +57,116 @@ const OutputFileNode = memo(
       });
     };
 
+    const handleUpdate = (field: string, val: unknown) => {
+      updateNodeData(id, {
+        [field]: val,
+      });
+    };
+
     const handleTriggerDevRun = async () => {
       setIsRunningTrigger(true);
 
-      const payload = getNodePayload(id);
-      console.log("Payload:", payload);
+      try {
+        const payload = getNodePayload(id);
+        console.log("payload", payload);
 
-      await new Promise((r) => setTimeout(r, 2000));
+        let allResults: Results[] = await Promise.all(
+          payload?.data.map(async (item) => {
+            let content = "";
+            const fileName = item.fileData?.fileName || "";
+            const fileType = item.fileData?.fileType || "";
+            const configData: PipelineConfig | undefined = item.configData;
 
-      const filename = data.filename || `converted_export.${currentFormat}`;
-      console.log("fileName ", filename);
+            const isJsonInput =
+              fileName.toLowerCase().endsWith(".json") ||
+              fileType.includes("json");
 
-      updateNodeData(id, {
-        status: "completed",
-      });
+            const transformOptions: TransformOptions = {
+              filterColumn: configData?.filterColumn as string | undefined,
+              filterOperation: configData?.filterOperation as
+                | string
+                | undefined,
+              filterValue: configData?.filterValue as string | undefined,
+              limitRows: configData?.limitRows
+                ? Number(configData?.limitRows)
+                : undefined,
+              removeEmptyRows: configData?.removeEmptyRows as
+                | boolean
+                | undefined,
+              trimWhitespace: configData?.trimWhitespace as boolean | undefined,
+              sortColumn: configData?.sortColumn as string | undefined,
+              sortDirection: configData?.sortDirection as string | undefined,
+            };
 
-      setIsRunningTrigger(false);
+            if (item.fileData?.file instanceof File) {
+              content = await item.fileData.file.text();
+            }
+
+            const rows = processInputData(content, {
+              ...transformOptions,
+              isJsonInput,
+            });
+
+            return {
+              fileName,
+              rows,
+            };
+          })
+        );
+
+        const fileNameResults =
+          data.filename || `converted_export.${currentFormat}`;
+
+        if (mergeOutput) {
+          let mergeResults: Results = {
+            fileName: fileNameResults,
+            rows: [],
+          };
+          if (allResults.length) {
+            mergeResults = {
+              ...mergeResults,
+              rows: allResults.flatMap((res) =>
+                res.fileName
+                  ? res.rows.map((row) => ({
+                      _sourceFile: res.fileName,
+                      ...row,
+                    }))
+                  : res.rows
+              ),
+            };
+          }
+
+          allResults = [mergeResults];
+        }
+
+        allResults.forEach((ar) => {
+          let tempContent;
+          let tempMimeType;
+          let tempFileName = fileNameResults;
+
+          if (currentFormat === "csv") {
+            tempContent = convertRowsToCsv(ar.rows);
+            tempMimeType = ALLOWED_FILE_TYPES.CSV;
+          } else {
+            tempContent = JSON.stringify(ar.rows, null, 2);
+            tempMimeType = ALLOWED_FILE_TYPES.JSON;
+          }
+
+          if (currentFormat === "csv" && ar.fileName.endsWith(".json")) {
+            tempFileName = ar.fileName.replace(/\.json$/i, ".csv");
+          } else if (currentFormat === "json" && ar.fileName.endsWith(".csv")) {
+            tempFileName = ar.fileName.replace(/\.csv$/i, ".json");
+          }
+
+          downloadFile(tempContent, tempFileName, tempMimeType);
+          updateNodeData(id, { status: "completed" });
+        });
+      } catch (error) {
+        console.error("Error executing Trigger.dev run:", error);
+        updateNodeData(id, { status: "error" });
+      } finally {
+        setIsRunningTrigger(false);
+      }
     };
 
     return (
@@ -71,16 +180,16 @@ const OutputFileNode = memo(
           type="target"
           position={Position.Left}
           style={{ top: "30%" }}
-          id={EDGE_CLASSIFICATION.INPUT}
-          accepts={[EDGE_CLASSIFICATION.INPUT]}
+          id={EDGE_TYPES.INPUT}
+          accepts={[EDGE_TYPES.INPUT]}
           fillClassName="fill-emerald-600 group-hover:fill-emerald-500"
         />
         <DashedCircleHandle
           type="target"
           position={Position.Left}
           style={{ top: "70%" }}
-          id={EDGE_CLASSIFICATION.FILTER}
-          accepts={[EDGE_CLASSIFICATION.FILTER]}
+          id={EDGE_TYPES.MODIF}
+          accepts={[EDGE_TYPES.MODIF]}
           fillClassName="fill-purple-500 group-hover:fill-purple-400"
         />
 
@@ -99,7 +208,7 @@ const OutputFileNode = memo(
           </Badge>
         </div>
 
-        <p className="text-muted-foreground mb-3 text-left text-[10px] leading-relaxed">
+        <p className="text-muted-foreground mb-3! text-left text-[10px] leading-relaxed">
           {data.description || "Select format for generated file."}
         </p>
 
@@ -117,6 +226,18 @@ const OutputFileNode = memo(
               updateFormat((val as OutputFormat) || "json")
             }
           />
+        </div>
+
+        <div className="border-border/50 space-y-1.5 border-t py-2 text-[10px]">
+          <label className="flex cursor-pointer items-center justify-between">
+            <span className="text-muted-foreground">Merge Output</span>
+            <input
+              type="checkbox"
+              checked={mergeOutput}
+              onChange={(e) => handleUpdate("mergeOutput", e.target.checked)}
+              className="rounded accent-purple-500"
+            />
+          </label>
         </div>
 
         <div className="bg-muted/40 border-border/50 mb-3 flex items-center justify-between rounded-xl border p-2 text-[10px]">
@@ -169,4 +290,3 @@ const OutputFileNode = memo(
 );
 
 export default OutputFileNode;
-

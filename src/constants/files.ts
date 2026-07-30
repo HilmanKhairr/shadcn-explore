@@ -15,6 +15,8 @@ export const ALLOWED_FILE_TYPES = {
   XLSX: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   CSV: "text/csv",
 
+  JSON: "application/json",
+
   // Archives
   ZIP: "application/zip",
   RAR: "application/x-rar-compressed",

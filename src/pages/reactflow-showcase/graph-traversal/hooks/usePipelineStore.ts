@@ -16,72 +16,7 @@ import type {
   PipelineState,
 } from "../types/pipeline";
 
-const initialNodes: Node[] = [
-  {
-    id: "n1",
-    position: { x: 0, y: 50 },
-    type: "inputNode",
-    data: {
-      accept: "csv",
-      buttonProps: {
-        children: "Upload File CSV",
-      },
-    },
-  },
-  {
-    id: "n11",
-    position: { x: -150, y: 300 },
-    type: "inputNode",
-    data: {
-      accept: "csv",
-      buttonProps: {
-        children: "Upload File CSV",
-      },
-    },
-  },
-  {
-    id: "n2",
-    position: { x: 400, y: 50 },
-    type: "filterNode",
-    data: {
-      title: "Transform Config Node",
-      description: "Konfigurasi filter baris, kolom, dan layout PDF.",
-      filterColumn: "status",
-      filterValue: "Active",
-      textTransform: "none",
-      limitRows: 100,
-      pdfOrientation: "portrait",
-    },
-  },
-  {
-    id: "n22",
-    position: { x: 200, y: 500 },
-    type: "filterNode",
-    data: {
-      title: "Transform Config Node",
-      description: "Konfigurasi filter baris, kolom, dan layout PDF.",
-      filterColumn: "status",
-      filterValue: "Active",
-      textTransform: "none",
-      limitRows: 100,
-      pdfOrientation: "portrait",
-    },
-  },
-  {
-    id: "n3",
-    position: { x: 900, y: 350 },
-    type: "outputFile",
-    data: {
-      title: "Output File Node",
-      description:
-        "Pilih format hasil konversi (JSON / PDF) dan proses via Trigger.dev.",
-      outputFormat: "json",
-      filename: "converted_result.json",
-      status: "idle",
-    },
-  },
-];
-
+const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 
 const usePipelineStore = create<PipelineState>((set, get) => ({
@@ -159,6 +94,66 @@ const usePipelineStore = create<PipelineState>((set, get) => ({
     });
   },
 
+  addNode: (type, variant) => {
+    const currentNodes = get().nodes;
+    const id = `node_${Date.now()}`;
+    const offset = (currentNodes.length % 5) * 40;
+
+    let defaultPosition = { x: 100 + offset, y: 100 + offset };
+    if (type === "inputNode") {
+      defaultPosition = { x: 50, y: 100 + offset };
+    } else if (type === "modifNode") {
+      defaultPosition = { x: 450, y: 100 + offset };
+    } else if (type === "outputNode") {
+      defaultPosition = { x: 1150, y: 100 + offset };
+    }
+
+    let newNode: Node;
+    if (type === "inputNode") {
+      const tempVar = variant || "csv";
+      newNode = {
+        id,
+        position: defaultPosition,
+        type: "inputNode",
+        data: {
+          title: `Upload ${tempVar.toUpperCase()}`,
+          description: `Node untuk input file ${tempVar.toUpperCase()}`,
+          accept: tempVar.toLowerCase(),
+          buttonProps: {
+            children: `Upload File ${tempVar.toUpperCase()}`,
+          },
+        },
+      };
+    } else if (type === "modifNode") {
+      newNode = {
+        id,
+        position: defaultPosition,
+        type: "modifNode",
+        data: {
+          title: "Transform Config Node",
+          description: "Node untuk konfigurasi filter dan sort",
+        },
+      };
+    } else {
+      newNode = {
+        id,
+        position: defaultPosition,
+        type: "outputNode",
+        data: {
+          title: "Output File Node",
+          description: "Node untuk download file hasil konversi",
+          outputFormat: "json",
+          filename: "converted_result.json",
+          status: "idle",
+        },
+      };
+    }
+
+    set({
+      nodes: [...currentNodes, newNode],
+    });
+  },
+
   getNodePayload: (targetNodeId: string) => {
     const { nodes, edges } = get();
 
@@ -194,7 +189,7 @@ const usePipelineStore = create<PipelineState>((set, get) => ({
               isValid = false;
             } else {
               data.push({
-                file: {
+                fileData: {
                   nodeId: sourceNode.id,
                   ...fileData.fileInfo,
                 },
@@ -202,7 +197,7 @@ const usePipelineStore = create<PipelineState>((set, get) => ({
             }
             break;
           }
-          case "filterNode": {
+          case "modifNode": {
             const configObj: PipelineConfig = {
               nodeId: sourceNode.id,
               ...sourceNode.data,
@@ -212,13 +207,13 @@ const usePipelineStore = create<PipelineState>((set, get) => ({
             if (!upstream.isValid) isValid = false;
 
             if (upstream.data.length === 0) {
-              data.push({ config: configObj });
+              data.push({ configData: configObj });
             } else {
               upstream.data.forEach((uItem) => {
                 data.push({
                   ...uItem,
-                  config: uItem.config
-                    ? { ...uItem.config, ...configObj }
+                  configData: uItem.configData
+                    ? { ...uItem.configData, ...configObj }
                     : configObj,
                 });
               });

@@ -21,8 +21,13 @@ const DashedBezierEdge = ({
   sourceY,
   targetX,
   targetY,
+  sourcePosition,
+  targetPosition,
   data,
-  ...props
+  style,
+  markerStart,
+  markerEnd,
+  interactionWidth,
 }: EdgeProps<DashedBezierEdgeProps>) => {
   const { deleteElements } = useReactFlow();
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -30,6 +35,8 @@ const DashedBezierEdge = ({
     sourceY,
     targetX,
     targetY,
+    sourcePosition,
+    targetPosition,
   });
 
   return (
@@ -49,11 +56,14 @@ const DashedBezierEdge = ({
         path={edgePath}
         labelX={labelX}
         labelY={labelY}
+        style={style}
+        markerStart={markerStart}
+        markerEnd={markerEnd}
+        interactionWidth={interactionWidth}
         className={cn(
           "stroke-border stroke-2! [stroke-dasharray:10,5]",
           data?.className
         )}
-        {...props}
       />
     </>
   );
