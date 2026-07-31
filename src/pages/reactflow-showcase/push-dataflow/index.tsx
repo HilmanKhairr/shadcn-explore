@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
+import SidebarConverterBuilder from "./components/SidebarConverterBuilder";
+import WorkflowConverter from "./components/WorkflowConverter";
+import SettingbarNode from "./components/SettingbarNode";
 
 export default function PushDataflowShowcase() {
   const navigate = useNavigate();
@@ -22,7 +25,11 @@ export default function PushDataflowShowcase() {
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col overflow-hidden md:flex-row"></div>
+      <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
+        <SidebarConverterBuilder />
+        <WorkflowConverter />
+        <SettingbarNode />
+      </div>
     </div>
   );
 }
