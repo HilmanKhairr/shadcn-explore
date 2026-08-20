@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { processInputData } from "@/lib/csvConverter";
 import { cn } from "@/lib/utils";
-import { processInputData } from "@/triggers/csvConverter";
 import { useReactFlow } from "@xyflow/react";
 import { ChevronDownIcon, Eye, Files, Maximize2, Table } from "lucide-react";
 import { useMemo, useState } from "react";

@@ -15,8 +15,8 @@ import { EDGE_TYPES } from "../../constants/pipeline";
 import DashedCircleHandle from "../handle/DashedCircleHadle";
 
 import { ALLOWED_FILE_TYPES } from "@/constants/files";
+import { convertRowsToCsv, processInputData } from "@/lib/csvConverter";
 import { downloadFile } from "@/lib/files";
-import { convertRowsToCsv, processInputData } from "@/triggers/csvConverter";
 import { memo, useCallback, useEffect, useState } from "react";
 import type {
   InputFileNodeData,

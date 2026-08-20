@@ -1,6 +1,13 @@
-import { ArrowLeft, ArrowRight, Network, RefreshCw, Zap } from "lucide-react";
-import { Link } from "react-router";
 import { ThemeToggle } from "@/components/PlaygroundCommon";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Layers,
+  Network,
+  RefreshCw,
+  Zap,
+} from "lucide-react";
+import { Link } from "react-router";
 
 export default function ReactflowShowcaseIndex() {
   return (
@@ -26,7 +33,7 @@ export default function ReactflowShowcaseIndex() {
       </header>
 
       {/* Hero Section */}
-      <main className="relative z-10 my-auto flex w-full max-w-5xl flex-col items-center py-12 text-center">
+      <main className="relative z-10 my-auto flex w-full max-w-6xl flex-col items-center py-12 text-center">
         <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-3.5 py-1 text-xs font-semibold text-fuchsia-600 dark:bg-fuchsia-400/10 dark:text-fuchsia-400">
           <Network className="size-3.5" />
           Architecture Paradigm Comparison
@@ -34,17 +41,19 @@ export default function ReactflowShowcaseIndex() {
 
         <h1 className="text-foreground mt-2 block max-w-3xl text-4xl leading-[1.15] font-extrabold tracking-tight md:text-5xl">
           Choose a{" "}
-          <span className="bg-gradient-to-r from-fuchsia-500 to-indigo-500 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-fuchsia-500 via-indigo-500 to-emerald-500 bg-clip-text text-transparent">
             Flow Architecture
           </span>
         </h1>
 
-        <p className="text-muted-foreground mt-4 max-w-xl text-base md:text-lg">
-          Explore two distinct state propagation models in node-based canvas graphs: Pull-based Graph Traversal vs Push-based Reactive Dataflow.
+        <p className="text-muted-foreground mt-4 max-w-2xl text-base md:text-lg">
+          Explore three distinct state propagation & execution models in
+          node-based canvas graphs: Graph Traversal, Push Dataflow, and Workflow
+          Execution.
         </p>
 
         {/* Showcase Cards Grid */}
-        <div className="mt-12 grid w-full grid-cols-1 gap-8 text-left sm:grid-cols-2">
+        <div className="mt-12 grid w-full grid-cols-1 gap-8 text-left md:grid-cols-3">
           {/* Graph Traversal Card */}
           <Link
             to="/reactflow-showcase/graph-traversal"
@@ -57,11 +66,12 @@ export default function ReactflowShowcaseIndex() {
               <div className="flex size-12 items-center justify-center rounded-2xl bg-fuchsia-500/10 text-fuchsia-600 transition-all duration-300 group-hover:scale-110 dark:text-fuchsia-400">
                 <RefreshCw className="size-6" />
               </div>
-              <h2 className="text-foreground mt-6 text-2xl font-bold tracking-tight transition-colors group-hover:text-fuchsia-500">
+              <h2 className="text-foreground mt-6 text-xl font-bold tracking-tight transition-colors group-hover:text-fuchsia-500">
                 Graph Traversal (Pull Model)
               </h2>
               <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-                Nodes pull data dynamically from upstream connections on-demand. Uses graph traversal functions and memoized store selectors.
+                Nodes pull data dynamically from upstream connections on-demand.
+                Uses graph traversal functions and memoized store selectors.
               </p>
 
               {/* Tag Badges */}
@@ -100,11 +110,12 @@ export default function ReactflowShowcaseIndex() {
               <div className="flex size-12 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 transition-all duration-300 group-hover:scale-110 dark:text-indigo-400">
                 <Zap className="size-6" />
               </div>
-              <h2 className="text-foreground mt-6 text-2xl font-bold tracking-tight transition-colors group-hover:text-indigo-500">
+              <h2 className="text-foreground mt-6 text-xl font-bold tracking-tight transition-colors group-hover:text-indigo-500">
                 Push Dataflow (Reactive Model)
               </h2>
               <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-                Nodes automatically push state updates downstream whenever their values change. Real-time event propagation across node edges.
+                Nodes automatically push state updates downstream whenever their
+                values change. Real-time event propagation across node edges.
               </p>
 
               {/* Tag Badges */}
@@ -127,6 +138,49 @@ export default function ReactflowShowcaseIndex() {
 
             <div className="mt-8 flex items-center text-sm font-semibold text-indigo-500 group-hover:text-indigo-600">
               Open Push Dataflow
+              <ArrowRight className="ml-1.5 size-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </div>
+          </Link>
+
+          {/* Workflow Card */}
+          <Link
+            to="/reactflow-showcase/workflow"
+            className="group border-border bg-card relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/50 hover:shadow-[0_15px_30px_-10px_rgba(16,185,129,0.15)]"
+          >
+            {/* Background Glow */}
+            <div className="absolute -top-16 -right-16 -z-10 size-48 rounded-full bg-emerald-500/10 blur-3xl transition-all duration-500 group-hover:scale-125" />
+
+            <div>
+              <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 transition-all duration-300 group-hover:scale-110 dark:text-emerald-400">
+                <Layers className="size-6" />
+              </div>
+              <h2 className="text-foreground mt-6 text-xl font-bold tracking-tight transition-colors group-hover:text-emerald-500">
+                Workflow
+              </h2>
+              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                Sequential node execution model with header prompt queueing and
+                real-time visual progress tracking per node.
+              </p>
+
+              {/* Tag Badges */}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {[
+                  "Queue Prompt",
+                  "Step-by-Step Progress",
+                  "Sequential Flow",
+                ].map((tag) => (
+                  <span
+                    key={tag}
+                    className="border-border bg-muted/50 text-muted-foreground rounded-full border px-2.5 py-0.5 text-xs"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 flex items-center text-sm font-semibold text-emerald-500 group-hover:text-emerald-600">
+              Open Workflow
               <ArrowRight className="ml-1.5 size-4 transition-transform duration-300 group-hover:translate-x-1" />
             </div>
           </Link>

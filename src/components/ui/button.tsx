@@ -62,19 +62,26 @@ export interface ButtonProps
 
 function ButtonLoader({
   className,
-  isCenter,
+  loadingIcon,
   ...props
-}: React.ComponentProps<typeof Loader2> & { isCenter?: boolean }) {
+}: React.ComponentProps<typeof Loader2> & {
+  loadingIcon?: React.ReactNode;
+}) {
+  if (loadingIcon) {
+    return (
+      <span
+        className={cn(
+          "inline-flex shrink-0 items-center justify-center",
+          className
+        )}
+      >
+        {loadingIcon}
+      </span>
+    );
+  }
+
   return (
-    <Loader2
-      className={cn(
-        "h-4 w-4 animate-spin",
-        className,
-        isCenter &&
-          "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-      )}
-      {...props}
-    />
+    <Loader2 className={cn("shrink-0 animate-spin", className)} {...props} />
   );
 }
 
@@ -82,9 +89,9 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  fullWidth = false,
   loading = false,
   loadingPosition = "left",
-  fullWidth = false,
   startIcon,
   endIcon,
   disabled,
@@ -92,64 +99,73 @@ function Button({
   slotProps,
   ...props
 }: ButtonProps) {
-  const { loader: loaderProps, span: spanProps } = slotProps ?? {};
-  const { className: loaderClassName, ...restLoaderProps } = loaderProps ?? {};
-  const { className: spanClassName, ...restSpanProps } = spanProps ?? {};
-
-  const isIconSize =
-    size && ["icon-xs", "icon-sm", "icon", "icon-lg"].includes(size);
+  if (size && ["icon-xs", "icon-sm", "icon", "icon-lg"].includes(size)) {
+    return (
+      <ButtonPrimitive
+        data-slot="button"
+        disabled={disabled || loading}
+        className={cn(
+          buttonVariants({
+            variant,
+            size,
+            fullWidth,
+            className,
+          })
+        )}
+        {...props}
+      >
+        {loading ? <ButtonLoader {...slotProps?.loader} /> : children}
+      </ButtonPrimitive>
+    );
+  }
 
   const showCenterLoader = loading && loadingPosition === "center";
   const showLeftLoader = loading && loadingPosition === "left";
   const showRightLoader = loading && loadingPosition === "right";
 
   const showStartIcon =
-    startIcon && !showLeftLoader && !showCenterLoader && !isIconSize;
-  const showEndIcon =
-    endIcon && !showRightLoader && !showCenterLoader && !isIconSize;
+    Boolean(startIcon) && !showLeftLoader && !showCenterLoader;
+  const showEndIcon = Boolean(endIcon) && !showRightLoader && !showCenterLoader;
 
-  const hasChildren = isIconSize ? !loading : !!children;
+  const renderChildren = () => {
+    if (showCenterLoader) {
+      return (
+        <span
+          {...slotProps?.span}
+          className={cn("inline-grid", slotProps?.span?.className)}
+        >
+          <span className="invisible col-start-1 row-start-1">{children}</span>
+          <span className="col-start-1 row-start-1 flex items-center justify-center">
+            <ButtonLoader {...slotProps?.loader} />
+          </span>
+        </span>
+      );
+    }
+
+    return children;
+  };
 
   return (
     <ButtonPrimitive
       data-slot="button"
       disabled={disabled || loading}
-      className={cn(buttonVariants({ variant, size, fullWidth, className }))}
+      className={cn(
+        buttonVariants({
+          variant,
+          size,
+          fullWidth,
+          className,
+        })
+      )}
       {...props}
     >
-      {showLeftLoader && (
-        <ButtonLoader className={loaderClassName} {...restLoaderProps} />
-      )}
+      {showLeftLoader && <ButtonLoader {...slotProps?.loader} />}
       {showStartIcon && startIcon}
-
-      {(hasChildren || showCenterLoader) && (
-        <span
-          className={cn(
-            "relative inline-flex flex-1 shrink-0 items-center justify-center",
-            spanClassName
-          )}
-          {...restSpanProps}
-        >
-          {showCenterLoader && (
-            <ButtonLoader
-              isCenter={hasChildren}
-              className={loaderClassName}
-              {...restLoaderProps}
-            />
-          )}
-          <span className={cn(showCenterLoader && "invisible")}>
-            {children}
-          </span>
-        </span>
-      )}
-
-      {showRightLoader && (
-        <ButtonLoader className={loaderClassName} {...restLoaderProps} />
-      )}
+      {renderChildren()}
+      {showRightLoader && <ButtonLoader {...slotProps?.loader} />}
       {showEndIcon && endIcon}
     </ButtonPrimitive>
   );
 }
 
 export { Button, buttonVariants };
-

@@ -32,7 +32,7 @@ function WelcomeHub() {
         </div>
         <h1 className="text-foreground mt-2 block max-w-3xl text-4xl leading-[1.15] font-extrabold tracking-tight md:text-6xl">
           Explore the Power of{" "}
-          <span className="bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-violet-500 to-fuchsia-500 bg-clip-text text-transparent">
             Modern UIs
           </span>
         </h1>

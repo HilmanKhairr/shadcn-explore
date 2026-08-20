@@ -1,20 +1,3 @@
-import type { PipelinePayload } from "@/pages/reactflow-showcase/graph-traversal/types/pipeline";
-
-export interface ConvertCsvPayload {
-  payload?: PipelinePayload;
-  csvContent?: string;
-  filename?: string;
-}
-
-export interface ConvertCsvResult {
-  success: boolean;
-  filename: string;
-  rowCount: number;
-  data: Record<string, unknown>[];
-  jsonString: string;
-  processedAt: string;
-}
-
 export interface TransformOptions {
   filterColumn?: string;
   filterOperation?: string;
@@ -34,8 +17,6 @@ export function applyDataTransformations(
   options?: TransformOptions
 ): Record<string, unknown>[] {
   let result = [...rows];
-
-  console.log("result", result);
 
   // 1. Trim whitespace if option enabled
   if (options?.trimWhitespace) {

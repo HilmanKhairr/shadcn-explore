@@ -1,6 +1,5 @@
 import CompactSelect from "@/components/compact/CompactSelect";
 import { Badge } from "@/components/ui/badge";
-import { processInputData } from "@/lib/csvConverter";
 import { cn } from "@/lib/utils";
 import {
   Position,
@@ -11,17 +10,16 @@ import {
   type Node,
   type NodeProps,
 } from "@xyflow/react";
-import { AlertCircle, SlidersHorizontal } from "lucide-react";
+import { AlertCircle, LoaderIcon, SlidersHorizontal } from "lucide-react";
 import { memo, useEffect } from "react";
-import { EDGE_TYPES } from "../../constants/pipeline";
+import { EDGE_TYPE, NODE_STATUS } from "../../constants/workflow";
 import {
   type InputFileNodeData,
   type ModifFileNodeData,
-  type ProcessedFileItem,
-} from "../../types/pipeline";
-import DashedCircleHandle from "../handle/DashedCircleHadle";
+} from "../../types/workflow";
+import DashedCircleHandle from "../handle/DashedCircleHandle";
 
-export type ModifFileNodeProps = Node<ModifFileNodeData, "modifNode">;
+export type ModifFileNodeProps = Node<ModifFileNodeData, "transformNode">;
 
 const operationOptions = [
   { value: "equals", label: "Equals (=)" },
@@ -53,6 +51,7 @@ const ModifFileNode = memo(
     const nodesData = useNodesData(sourceIds);
 
     const hasSourceNode = !!sourceIds.length;
+    const mergeSources = data?.value?.mergeSources ?? false;
     const filterColumn = data?.value?.filterColumn || "";
     const filterOperation = data?.value?.filterOperation || "";
     const filterValue = data?.value?.filterValue || "";
@@ -65,19 +64,22 @@ const ModifFileNode = memo(
     const sortColumn = data?.value?.sortColumn || "";
     const sortDirection = data?.value?.sortDirection || "";
 
+    const nodeStatus = data.status || NODE_STATUS.IDLE;
+    const statusIdle = nodeStatus === NODE_STATUS.IDLE;
+    const statusQueued = nodeStatus === NODE_STATUS.QUEUED;
+    const statusRunning = nodeStatus === NODE_STATUS.RUNNING;
+    const statusCompleted = nodeStatus === NODE_STATUS.COMPLETED;
+
     const handleUpdate = (field: string, val: unknown) => {
       updateNodeData(id, (node) => {
         return {
           value: { ...node?.data?.value, [field]: val },
+          status: NODE_STATUS.IDLE,
         };
       });
     };
 
     useEffect(() => {
-      const sourceValue = nodesData
-        .map((nd) => (nd?.data as InputFileNodeData)?.processedValue ?? null)
-        .filter(Boolean);
-
       const hasConnectedNodes = nodesData.length > 0;
       const isAllInputsValid =
         hasConnectedNodes &&
@@ -85,59 +87,28 @@ const ModifFileNode = memo(
           return Boolean((nd?.data as InputFileNodeData)?.isValid);
         });
 
-      const items: ProcessedFileItem[] = [];
-
-      for (const srcFile of sourceValue) {
-        if (srcFile && srcFile.content) {
-          const rows = processInputData(srcFile.content, {
-            filterColumn: filterColumn || undefined,
-            filterOperation: filterOperation || undefined,
-            filterValue: filterValue || undefined,
-            limitRows: limitRows ? Number(limitRows) : undefined,
-            removeEmptyRows,
-            trimWhitespace,
-            sortColumn: sortColumn || undefined,
-            sortDirection: (sortDirection as "asc" | "desc") || undefined,
-          });
-
-          items.push({
-            fileName: srcFile.fileName,
-            rows,
-            headers: Object.keys(rows[0] || {}),
-          });
-        }
-      }
-
       updateNodeData(id, {
-        processedValue: items,
         isValid: isAllInputsValid,
       });
-    }, [
-      id,
-      nodesData,
-      filterColumn,
-      filterOperation,
-      filterValue,
-      limitRows,
-      removeEmptyRows,
-      trimWhitespace,
-      sortColumn,
-      sortDirection,
-      updateNodeData,
-    ]);
+    }, [id, nodesData, updateNodeData]);
 
     return (
       <div
         className={cn(
           "bg-card border-border hover:border-primary/60 focus:border-primary max-w-160 min-w-72 rounded-2xl border p-4.5 shadow-md transition-all",
-          !!selected && "border-primary! ring-primary/20 shadow-lg ring-2"
+          !!selected && "border-primary! ring-primary/20 shadow-lg ring-2",
+          statusQueued && "border-amber-500/50 bg-amber-500/5",
+          statusRunning &&
+            "border-purple-500 shadow-[0_0_25px_rgba(16,185,129,0.5)] ring-4 ring-purple-500",
+          statusCompleted &&
+            "border-purple-500/80 bg-purple-500/5 dark:bg-purple-950/10"
         )}
       >
         <DashedCircleHandle
           type="target"
           position={Position.Left}
-          id={EDGE_TYPES.INPUT}
-          accepts={[EDGE_TYPES.INPUT]}
+          id={EDGE_TYPE.INPUT}
+          accepts={[EDGE_TYPE.INPUT]}
           fillClassName="fill-emerald-600 group-hover:fill-emerald-500"
         />
 
@@ -148,23 +119,65 @@ const ModifFileNode = memo(
               {data.title || "Transform Config Node"}
             </span>
           </div>
-          <Badge
-            variant="outline"
-            className={cn(
-              "font-mono text-[9px] uppercase",
-              hasSourceNode
-                ? "border-purple-500/40 bg-purple-500/10 text-purple-400"
-                : "border-amber-500/40 bg-amber-500/10 text-amber-400"
-            )}
-          >
-            {hasSourceNode ? "READY" : "AWAITING DATA"}
-          </Badge>
+          {statusIdle && (
+            <Badge
+              variant="outline"
+              className={cn(
+                "font-mono text-[9px] uppercase",
+                hasSourceNode
+                  ? "border-purple-500/40 bg-purple-500/10 text-purple-400"
+                  : "border-amber-500/40 bg-amber-500/10 text-amber-400"
+              )}
+            >
+              {hasSourceNode ? "READY" : "AWAITING DATA"}
+            </Badge>
+          )}
+          {statusQueued && (
+            <Badge
+              variant="outline"
+              className="border-amber-500/40 bg-amber-500/10 font-mono text-[9px] text-amber-400"
+            >
+              Queued
+            </Badge>
+          )}
+          {statusRunning && (
+            <Badge
+              variant="outline"
+              className="animate-pulse border-purple-500/40 bg-purple-500/10 font-mono text-[9px] text-purple-400"
+            >
+              <LoaderIcon className="size-3 animate-spin" />
+              Transforming
+            </Badge>
+          )}
+          {statusCompleted && (
+            <Badge
+              variant="outline"
+              className="border-purple-500/40 bg-purple-500/10 font-mono text-[9px] text-purple-400"
+            >
+              Ready
+            </Badge>
+          )}
         </div>
 
         <p className="text-muted-foreground mb-3! text-left text-[10px] leading-relaxed">
           {data.description ||
             "Konfigurasi kriteria filter baris dan transformasi data secara dinamis."}
         </p>
+
+        {(statusRunning || statusQueued) && (
+          <div className="mb-3 space-y-1 text-left">
+            <div className="flex justify-between font-mono text-[15px] font-semibold text-purple-400">
+              <span>{statusRunning ? "Transforming..." : "Queued"}</span>
+              <span>{data.progress || 0}%</span>
+            </div>
+            <div className="h-3.5 w-full overflow-hidden rounded-full border border-purple-500/20 bg-purple-950/40">
+              <div
+                className="h-full bg-linear-to-r from-purple-500 to-indigo-400 transition-all duration-200 ease-out"
+                style={{ width: `${data.progress || 0}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {!hasSourceNode ? (
           <div className="my-2 flex flex-col items-center rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 text-center">
@@ -192,6 +205,7 @@ const ModifFileNode = memo(
                   <input
                     type="text"
                     value={filterColumn}
+                    disabled={statusRunning || statusQueued}
                     onChange={(e) =>
                       handleUpdate("filterColumn", e.target.value)
                     }
@@ -209,6 +223,7 @@ const ModifFileNode = memo(
                     placeholder="Condition"
                     value={filterOperation}
                     items={operationOptions}
+                    disabled={statusRunning || statusQueued}
                     onValueChange={(val) =>
                       handleUpdate("filterOperation", val)
                     }
@@ -221,6 +236,7 @@ const ModifFileNode = memo(
                   <input
                     type="text"
                     value={filterValue}
+                    disabled={statusRunning || statusQueued}
                     onChange={(e) =>
                       handleUpdate("filterValue", e.target.value)
                     }
@@ -240,6 +256,7 @@ const ModifFileNode = memo(
                   placeholder="Select Limit"
                   value={limitRows}
                   items={limitOptions}
+                  disabled={statusRunning || statusQueued}
                   onValueChange={(val) =>
                     handleUpdate("limitRows", Number(val))
                   }
@@ -249,11 +266,27 @@ const ModifFileNode = memo(
               <div className="border-border/50 space-y-1.5 border-t pt-2 text-[10px]">
                 <label className="flex cursor-pointer items-center justify-between">
                   <span className="text-muted-foreground">
+                    Merge Incoming Sources
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={mergeSources}
+                    disabled={statusRunning || statusQueued}
+                    onChange={(e) =>
+                      handleUpdate("mergeSources", e.target.checked)
+                    }
+                    className="rounded accent-purple-500"
+                  />
+                </label>
+
+                <label className="flex cursor-pointer items-center justify-between">
+                  <span className="text-muted-foreground">
                     Remove Empty Rows
                   </span>
                   <input
                     type="checkbox"
                     checked={removeEmptyRows}
+                    disabled={statusRunning || statusQueued}
                     onChange={(e) =>
                       handleUpdate("removeEmptyRows", e.target.checked)
                     }
@@ -266,6 +299,7 @@ const ModifFileNode = memo(
                   <input
                     type="checkbox"
                     checked={trimWhitespace}
+                    disabled={statusRunning || statusQueued}
                     onChange={(e) =>
                       handleUpdate("trimWhitespace", e.target.checked)
                     }
@@ -286,6 +320,7 @@ const ModifFileNode = memo(
                   <input
                     type="text"
                     value={sortColumn}
+                    disabled={statusRunning || statusQueued}
                     onChange={(e) => handleUpdate("sortColumn", e.target.value)}
                     placeholder="e.g. status, user_id, price..."
                     className="bg-background border-border text-foreground placeholder:text-muted-foreground/60 h-8 w-full rounded-lg border px-2 font-mono text-xs transition-colors focus:border-purple-500 focus:outline-none"
@@ -301,6 +336,7 @@ const ModifFileNode = memo(
                     placeholder="Asc / Desc"
                     value={sortDirection}
                     items={sortDirectionOptions}
+                    disabled={statusRunning || statusQueued}
                     onValueChange={(val) => handleUpdate("sortDirection", val)}
                   />
                 </div>
@@ -309,11 +345,15 @@ const ModifFileNode = memo(
           </div>
         )}
 
+        <div className="mt-2 -mb-2 text-[10px] font-bold text-gray-500">
+          {id}
+        </div>
+
         <DashedCircleHandle
           type="source"
           position={Position.Right}
-          id={EDGE_TYPES.MODIF}
-          accepts={[EDGE_TYPES.MODIF]}
+          id={EDGE_TYPE.MODIF}
+          accepts={[EDGE_TYPE.MODIF]}
           fillClassName="fill-purple-600 group-hover:fill-purple-500"
         />
       </div>

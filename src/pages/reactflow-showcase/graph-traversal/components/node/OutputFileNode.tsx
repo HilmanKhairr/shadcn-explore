@@ -20,7 +20,7 @@ import {
   convertRowsToCsv,
   processInputData,
   type TransformOptions,
-} from "@/triggers/csvConverter";
+} from "@/lib/csvConverter";
 import { memo, useState } from "react";
 
 export type OutputFileNodeProps = Node<OutputFileNodeData, "outputNode">;
@@ -63,13 +63,11 @@ const OutputFileNode = memo(
       });
     };
 
-    const handleTriggerDevRun = async () => {
+    const handleRun = async () => {
       setIsRunningTrigger(true);
 
       try {
         const payload = getNodePayload(id);
-        console.log("payload", payload);
-
         let allResults: Results[] = await Promise.all(
           payload?.data.map(async (item) => {
             let content = "";
@@ -269,7 +267,7 @@ const OutputFileNode = memo(
             size="sm"
             disabled={status === "running" || !isValidPipeline}
             className="bg-linear-to-r from-blue-600 to-rose-600 font-bold text-white shadow-md transition-all disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleTriggerDevRun}
+            onClick={handleRun}
           >
             {status === "running" ? (
               <span className="flex items-center gap-1.5">

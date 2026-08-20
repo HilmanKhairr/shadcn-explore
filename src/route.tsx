@@ -3,6 +3,7 @@ import App from "./App";
 import ReactflowShowcaseIndex from "./pages/reactflow-showcase";
 import GraphTraversalShowcase from "./pages/reactflow-showcase/graph-traversal";
 import PushDataflowShowcase from "./pages/reactflow-showcase/push-dataflow";
+import WorkflowShowcase from "./pages/reactflow-showcase/workflow";
 import ShadcnShowcase from "./pages/shadcn-showcase";
 
 const router = createBrowserRouter([
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
           {
             path: "push-dataflow",
             element: <PushDataflowShowcase />,
+          },
+          {
+            path: "workflow",
+            element: <WorkflowShowcase />,
           },
         ],
       },
