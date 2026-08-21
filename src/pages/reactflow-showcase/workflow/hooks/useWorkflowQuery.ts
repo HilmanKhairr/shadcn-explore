@@ -11,7 +11,6 @@ import useWorkflowStore from "./useWorkflowStore";
 
 export const WORKFLOW_QUERY_KEYS = {
   detail: (id: string) => ["workflow", id] as const,
-  all: ["workflow"] as const,
 };
 
 export function useWorkflowDefinition(workflowId: string = WORKFLOW_ID) {
